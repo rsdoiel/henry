@@ -2,40 +2,71 @@
 
 **Building Llamafiles from HuggingFace Models with Custom Features**
 
-This guide explains how Henry converts HuggingFace models to GGUF format and packages them into Llamafiles, with support for custom chat templates, tool calling, embedding, and tagged content.
+*Version: 1.2 - Updated June 2026*
+
+This guide explains how Henry converts HuggingFace models to GGUF format and packages them into Llamafiles, with full support for custom chat templates, tool calling, embedding, and tagged content.
 
 ## Overview
 
-Henry supports **two workflows** for creating GGUF files:
+Henry is a **Factory for building Llamafiles** from open models on Hugging Face. It supports **three workflows**:
 
-| Workflow | Description | Models | Customization |
-|----------|-------------|--------|---------------|
-| **Pre-built GGUF** | Downloads pre-converted GGUF from HuggingFace | Granite (default) | Limited to pre-built features |
-| **Source Conversion** | Converts model sources to GGUF with custom templates | Apertus, others | Full control over features |
+| Workflow | Description | Models | Customization | Status |
+|----------|-------------|--------|---------------|--------|
+| **Pre-built GGUF** | Downloads pre-converted GGUF from HuggingFace | Granite 3.3 8B | Limited to pre-built features | ✅ Default |
+| **Source Conversion** | Converts model sources to GGUF with custom templates | Apertus 4B, Granite 3.3/4.1 | Full control over features | ✅ Available |
 
-Both workflows produce quantized GGUF files that are then packaged into Llamafiles.
+All workflows produce quantized GGUF files that are then packaged into **standalone Llamafile executables**.
 
 ---
 
 ## Quick Start
 
-### For Models with Pre-built GGUF (Granite)
+### Pre-built GGUF (Fastest)
 ```bash
+# Original Granite 3.3 8B with baked-in tool support
 make all MODEL=granite-3.3-8b
 ```
 
-### For Models Built from Source (Apertus)
+### Source Conversion (Custom Features)
 ```bash
+# Granite 3.3 8B - Full control, 128K context
+make all MODEL=granite-3.3-8b-source
+
+# Granite 4.1 3B - Enhanced tool calling, 128K+ context
+make all MODEL=granite-4.1-3b-source
+
+# Apertus 4B - Custom template, multilingual
 make all MODEL=apertus-4b
 ```
 
 ---
 
-## Workflow 1: Pre-built GGUF (Granite Example)
+## Supported Models
 
-This is the simplest workflow for models that already have GGUF versions available on HuggingFace.
+### IBM Granite Models
 
-### Configuration File: `models/granite-3.3-8b.yaml`
+| Model | Config File | Type | Size | Context | Features |
+|-------|-------------|------|------|---------|----------|
+| Granite 3.3 8B | `granite-3.3-8b.yaml` | Pre-built GGUF | 8B | 8K | Tool calling, function calling |
+| **Granite 3.3 8B** | **`granite-3.3-8b-source.yaml`** | **Source conversion** | **8B** | **128K** | **Tool calling, embedding, tagged, function calling** |
+| **Granite 4.1 3B** | **`granite-4.1-3b-source.yaml`** | **Source conversion** | **3B** | **128K+** | **Tool calling, embedding, tagged, function calling** |
+
+> **Note:** There is currently no official IBM Granite 4B *text* model. The closest is Granite 4.1 3B (3 billion parameters) or Granite Vision 4.1 4B (vision-language model).
+
+### Swiss-AI Apertus Models
+
+| Model | Config File | Type | Size | Context | Features |
+|-------|-------------|------|------|---------|----------|
+| **Apertus 4B** | **`apertus-4b.yaml`** | **Source conversion** | **4B** | **32K** | **Tool calling, embedding, tagged** |
+
+---
+
+## Workflow 1: Pre-built GGUF (Granite 3.3 8B)
+
+This is the **fastest workflow** for models that already have GGUF versions available on HuggingFace.
+
+### Configuration File
+`models/granite-3.3-8b.yaml`
 
 ```yaml
 name: granite-3.3-8b
@@ -55,16 +86,15 @@ notes: >
 ```
 
 **Key Fields:**
-- `hf_repo`: Points to a HuggingFace repository containing **pre-built GGUF files**
-- `gguf_file`: The specific GGUF file to download
-- `convert`: **Missing or `false`** → triggers pre-built download workflow
+- `hf_repo`: Points to pre-built GGUF repository
+- `gguf_file`: Pre-built GGUF to download
+- `convert`: Missing/false → uses pre-built workflow
 
 ### Process Flow
-
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  1. DOWNLOAD (scripts/download-model.sh)                        │
-│     ├── Parses config: hf_repo, gguf_file                      │
+│     ├── Parses: hf_repo, gguf_file                               │
 │     ├── Downloads: ibm-granite/granite-3.3-8b-instruct-GGUF     │
 │     │   └── granite-3.3-8b-instruct-Q4_K_M.gguf                │
 │     └── Saves to: models-cache/granite-3.3-8b/                  │
@@ -73,247 +103,151 @@ notes: >
 ┌─────────────────────────────────────────────────────────────┐
 │  2. PACKAGE (scripts/package.sh)                               │
 │     ├── Copies: tools/llamafile → llamafiles/output.llamafile │
-│     ├── Appends: GGUF file using zipalign                        │
-│     └── Result: Standalone executable Llamafile              │
+│     ├── Appends: GGUF using zipalign                             │
+│     └── Result: Standalone executable Llamafile                │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Commands
-
 ```bash
-# Check dependencies
-make deps
+make deps          # Check dependencies
+make tools         # Download llamafile + zipalign
+make download      # Download pre-built GGUF
+make package       # Package into Llamafile
+make all           # All steps combined
+make clean         # Clean up
+```
 
-# Download llamafile tools (llamafile binary, zipalign)
-make tools
-
-# Download pre-built GGUF
-make download MODEL=granite-3.3-8b
-
-# Package into Llamafile
-make package MODEL=granite-3.3-8b
-
-# Full build (all steps)
+Example:
+```bash
 make all MODEL=granite-3.3-8b
-
-# Clean up
-make clean
-```
-
-### Files Created
-```
-models-cache/granite-3.3-8b/
-  └── granite-3.3-8b-instruct-Q4_K_M.gguf    (~4.9 GB)
-
-llamafiles/
-  └── granite-3.3-8b-Q4_K_M.llamafile        (~5.0 GB executable)
 ```
 
 ---
 
-## Workflow 2: Source Conversion (Apertus Example)
+## Workflow 2: Source Conversion (Granite 3.3 8B)
 
-This workflow converts model **sources** (safetensors) to GGUF with custom chat templates, enabling features like tool calling and embedding support.
+Converts **Granite 3.3 8B from source** with custom chat template for full control over features.
 
-### Configuration File: `models/apertus-4b.yaml`
+### Configuration File
+`models/granite-3.3-8b-source.yaml`
 
 ```yaml
-name: apertus-4b
-display_name: "Swiss-AI Apertus 4B Instruct"
-hf_repo: swiss-ai/Apertus-v1.1-4B-Instruct
+name: granite-3.3-8b-source
+display_name: "IBM Granite 3.3 8B Instruct (Source)"
+hf_repo: ibm-granite/granite-3.3-8b-instruct
 source_type: safetensors
-
-# Build from source
-convert: true              # ← KEY: Enables source conversion
-quantization: Q4_K_M      # Target quantization method
-context_length: 32768     # Extended context
-chat_template: templates/apertus-4b-toolcall.jinja  # Custom template
-
-# Output files
-gguf_file: apertus-4b-instruct-Q4_K_M.gguf
-output: apertus-4b-Q4_K_M.llamafile
-
-# Features to bake into GGUF
+convert: true              # ← Enables source conversion
+quantization: Q4_K_M
+context_length: 122880    # Full 128K context
+chat_template: templates/granite-toolcall.jinja
+gguf_file: granite-3.3-8b-instruct-Q4_K_M.gguf
+output: granite-3.3-8b-source-Q4_K_M.llamafile
 features:
   - tool_calling
   - embedding
   - tagged
-
-# Metadata
+  - function_calling
 kind: instruct
-ram_gb: 2
+ram_gb: 6
 ```
 
-**Key Fields:**
-- `hf_repo`: Points to the **source model** (not GGUF)
-- `convert: true`: **Required** to trigger source conversion workflow
-- `chat_template`: Path to custom Jinja template for tool calling support
-- `context_length`: Extended to 32K for Apertus
+### Custom Template
+`templates/granite-toolcall.jinja`
 
-### Custom Jinja Template: `templates/apertus-4b-toolcall.jinja`
-
-```jinja
-{%- set ns = namespace(prev_role=None) -%}
-{{- bos_token -}}
-{%- for message in messages -%}
-    {%- set role = message['role'] -%}
-    
-    {%- if role == 'system' -%}
-        {{- '<|im_start|>system\n' -}}
-        {{- message['content'] | trim -}}
-        {{- '\n<|im_end|>\n' -}}
-    {%- elif role == 'user' -%}
-        {{- '<|im_start|>user\n' -}}
-        {{- message['content'] | trim -}}
-        {{- '\n<|im_end|>\n' -}}
-    {%- elif role == 'assistant' -%}
-        {{- '<|im_start|>assistant\n' -}}
-        
-        {%- if message.get('tool_calls') -%}
-            {%- for tool_call in message['tool_calls'] -%}
-{{- '<tool_call>\n' -}}
-{{- '{\n' -}}
-{{- '  "id": "' + tool_call.get('id', 'call_' + loop.index|string) + '",\n' -}}
-{{- '  "name": "' + tool_call['function']['name'] + '",\n' -}}
-{{- '  "arguments": ' + tool_call['function']['arguments']|string + '\n' -}}
-{{- '}\n' -}}
-{{- '</tool_call>\n' -}}
-            {%- endfor -%}
-        {%- endif -%}
-        
-        {%- if message.get('content') -%}
-{{- message['content'] | trim -}}
-        {%- endif -%}
-        
-        {{- '\n<|im_end|>\n' -}}
-    {%- endif -%}
-{%- endfor -%}
-{%- if add_generation_prompt -%}
-    {{- '<|im_start|>assistant\n' -}}
-{%- endif -%}
-```
-
-**Template Features:**
-- `<|im_start|>` and `<|im_end|>` tokens for message boundaries
-- `<tool_call>` tags for tool invocation
-- JSON-formatted tool call metadata (id, name, arguments)
-- Supports system, user, and assistant roles
-- Handles both text content and tool calls in assistant messages
+- **Tool Calling**: `<tool_call>` tags with JSON metadata
+- **Tagged Content**: `<think>` and `<response>` tags (Granite native)
+- **Message Boundaries**: `<|im_start|>` and `<|im_end|>` tokens
+- **Structured Output**: Machine-readable tool calls
 
 ### Process Flow
-
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  1. DOWNLOAD (scripts/download-model.sh)                        │
-│     ├── Detects: convert: true                                   │
-│     └── Calls: convert-model.sh + quantize-model.sh             │
+│  1. DOWNLOAD (detects convert:true)                             │
 └─────────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  2. CONVERT (scripts/convert-model.sh)                         │
-│     ├── Downloads source: swiss-ai/Apertus-v1.1-4B-Instruct    │
-│     │   └── Saves to: models-cache/apertus-4b/source/          │
-│     ├── Auto-clones: llama.cpp (if needed)                       │
-│     │   └── To: henry/llama.cpp/                                 │
-│     ├── Converts to FP16 GGUF                                   │
-│     │   └── Uses: templates/apertus-4b-toolcall.jinja          │
-│     │   └── Output: models-cache/apertus-4b/apertus-4b...gguf │
-│     └── Marks: .converted file                                  │
+│     ├── Downloads: ibm-granite/granite-3.3-8b-instruct        │
+│     ├── Auto-clones: llama.cpp if needed                        │
+│     ├── Converts: Safetensors → FP16 GGUF                      │
+│     │   └── Uses: templates/granite-toolcall.jinja           │
+│     └── Output: models-cache/.../granite-3.3-8b.fp16.gguf      │
 └─────────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  3. QUANTIZE (scripts/quantize-model.sh)                       │
-│     ├── Auto-builds: llama-quantize (if needed)                 │
-│     ├── Input: FP16 GGUF                                          │
-│     ├── Method: Q4_K_M (from config)                             │
-│     └── Output: Quantized GGUF (~2.5-3 GB for 4B)             │
+│     ├── Auto-builds: llama-quantize if needed                   │
+│     ├── Quantizes: FP16 → Q4_K_M                                │
+│     └── Output: models-cache/.../granite-3.3-8b-Q4_K_M.gguf   │
 └─────────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  4. PACKAGE (scripts/package.sh)                               │
-│     └── Same as pre-built workflow                              │
+│     └── Packages GGUF into Llamafile                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Commands
-
 ```bash
-# Check dependencies
-make deps
-
-# Download llamafile tools
-make tools
-
-# Full build (download source + convert + quantize + package)
-make all MODEL=apertus-4b
-
-# Or step-by-step:
-make convert MODEL=apertus-4b    # Source → FP16 GGUF
-make quantize MODEL=apertus-4b   # FP16 → Q4_K_M
-make package MODEL=apertus-4b    # GGUF → Llamafile
-
-# Clean up
-make clean
-```
-
-### Files Created
-```
-models-cache/apertus-4b/
-  ├── source/                    # Downloaded model sources
-  │   ├── config.json
-  │   ├── tokenizer.json
-  │   ├── tokenizer.model
-  │   └── model-*.safetensors
-  ├── apertus-4b-instruct-Q4_K_M.gguf.fp16.gguf  (~8 GB)
-  └── apertus-4b-instruct-Q4_K_M.gguf            (~2.5-3 GB)
-
-llamafiles/
-  └── apertus-4b-Q4_K_M.llamafile               (~3 GB executable)
+make all MODEL=granite-3.3-8b-source    # Full build
+make convert MODEL=granite-3.3-8b-source  # Source → FP16
+make quantize MODEL=granite-3.3-8b-source # FP16 → Q4_K_M
+make package MODEL=granite-3.3-8b-source  # GGUF → Llamafile
 ```
 
 ---
 
-## Configuration Reference
+## Workflow 3: Source Conversion (Granite 4.1 3B)
 
-### YAML Fields for All Models
+Converts **Granite 4.1 3B from source** with enhanced tool calling and extended context.
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `name` | string | ✅ | - | Internal model name (used for directories) |
-| `display_name` | string | ❌ | - | Human-readable model name |
-| `hf_repo` | string | ✅ | - | HuggingFace repository |
-| `output` | string | ✅ | - | Output Llamafile name |
-| `kind` | string | ❌ | - | Model type (instruct, base, etc.) |
-| `quantization` | string | ❌ | Q4_K_M | Target quantization method |
-| `context_length` | int | ❌ | 8192 | Model context length |
-| `ram_gb` | int | ❌ | - | Approximate RAM needed |
-| `notes` | string | ❌ | - | Additional notes |
+### Configuration File
+`models/granite-4.1-3b-source.yaml`
 
-### YAML Fields for Pre-built GGUF (Granite)
-
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `gguf_file` | string | ✅ | - | Pre-built GGUF filename to download |
-| `features` | list | ❌ | - | Features already in pre-built GGUF |
-
-**Example:**
 ```yaml
-hf_repo: ibm-granite/granite-3.3-8b-instruct-GGUF
-gguf_file: granite-3.3-8b-instruct-Q4_K_M.gguf
+name: granite-4.1-3b-source
+display_name: "IBM Granite 4.1 3B Instruct (Source)"
+hf_repo: ibm-granite/granite-4.1-3b
+source_type: safetensors
+convert: true
+quantization: Q4_K_M
+context_length: 131072    # Full 128K+ context
+chat_template: templates/granite-toolcall.jinja
+gguf_file: granite-4.1-3b-instruct-Q4_K_M.gguf
+output: granite-4.1-3b-source-Q4_K_M.llamafile
+features:
+  - tool_calling
+  - embedding
+  - tagged
+  - function_calling
+kind: instruct
+ram_gb: 2
 ```
 
-### YAML Fields for Source Conversion (Apertus)
+### Key Features
+- **Granite 4.1 family**: Improved SFT+RL pipelines
+- **Enhanced tool calling**: Better function integration
+- **128K+ context**: 131072 token context length
+- **Smaller footprint**: 3B parameters (~2 GB RAM)
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `source_type` | string | ❌ | safetensors | Source format |
-| `convert` | boolean | ✅ | - | Must be `true` to enable conversion |
-| `gguf_file` | string | ✅ | - | Output GGUF filename (will be generated) |
-| `chat_template` | string | ✅ | - | Path to Jinja template |
-| `features` | list | ❌ | - | Features to bake into GGUF |
+### Commands
+```bash
+make all MODEL=granite-4.1-3b-source
+```
 
-**Example:**
+---
+
+## Workflow 4: Source Conversion (Apertus 4B)
+
+Converts **Swiss-AI Apertus 4B from source** with custom template for tool calling.
+
+### Configuration File
+`models/apertus-4b.yaml`
+
 ```yaml
+name: apertus-4b
+display_name: "Swiss-AI Apertus 4B Instruct"
 hf_repo: swiss-ai/Apertus-v1.1-4B-Instruct
 source_type: safetensors
 convert: true
@@ -321,324 +255,361 @@ quantization: Q4_K_M
 context_length: 32768
 chat_template: templates/apertus-4b-toolcall.jinja
 gguf_file: apertus-4b-instruct-Q4_K_M.gguf
+output: apertus-4b-Q4_K_M.llamafile
+features:
+  - tool_calling
+  - embedding
+  - tagged
+kind: instruct
+ram_gb: 2
 ```
+
+### Custom Template
+`templates/apertus-4b-toolcall.jinja`
+
+- **Tool Calling**: `<tool_call>` tags with JSON
+- **Tagged Content**: Custom format
+- **Message Boundaries**: `<|im_start|>` and `<|im_end|>`
+- **Multilingual**: Supports 1811 languages
+
+### Commands
+```bash
+make all MODEL=apertus-4b
+```
+
+---
+
+## Model Comparison
+
+### Granite Family
+
+| Model | Size | Workflow | Context | RAM | Features |
+|-------|------|----------|---------|-----|----------|
+| `granite-3.3-8b` | 8B | Pre-built | 8K | ~6 GB | Tool calling, function calling |
+| `granite-3.3-8b-source` | 8B | Source | 128K | ~6 GB | **All features** |
+| `granite-4.1-3b-source` | 3B | Source | 128K+ | ~2 GB | **All features, enhanced** |
+
+### Apertus Family
+
+| Model | Size | Workflow | Context | RAM | Languages | Compliance |
+|-------|------|----------|---------|-----|-----------|------------|
+| `apertus-4b` | 4B | Source | 32K | ~2 GB | 1811 | EU AI Act |
+
+### Feature Matrix
+
+| Feature | Granite 3.3 8B (Pre-built) | Granite 3.3 8B (Source) | Granite 4.1 3B (Source) | Apertus 4B (Source) |
+|---------|----------------------------|--------------------------|-------------------------|---------------------|
+| Tool Calling | ✅ Baked in | ✅ Custom template | ✅ Enhanced | ✅ Custom template |
+| Embedding | ✅ | ✅ Explicit | ✅ Explicit | ✅ Explicit |
+| Tagged Content | ✅ Native | ✅ Custom + Native | ✅ Custom + Native | ✅ Custom |
+| Context Length | 8K | 128K | 128K+ | 32K |
+| Customization | ❌ | ✅ Full | ✅ Full | ✅ Full |
+| Multilingual | 12 | 12 | 12 | **1811** |
+
+---
+
+## Configuration Reference
+
+### Common YAML Fields
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `name` | string | ✅ | - | Internal name (directory names) |
+| `display_name` | string | ❌ | - | Human-readable name |
+| `hf_repo` | string | ✅ | - | HuggingFace repository |
+| `output` | string | ✅ | - | Output Llamafile name |
+| `kind` | string | ❌ | - | Model type (instruct/base) |
+| `quantization` | string | ❌ | Q4_K_M | Quantization method |
+| `context_length` | int | ❌ | 8192 | Context length in tokens |
+
+### Pre-built Specific Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `gguf_file` | string | GGUF filename to download |
+| `features` | list | Pre-built features |
+
+### Source Conversion Specific Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `source_type` | string | ❌ | Source format (safetensors) |
+| `convert` | boolean | ✅ | Must be `true` |
+| `chat_template` | string | ✅ | Jinja template path |
 
 ---
 
 ## Custom Chat Templates
 
-### Creating a New Template
+### Available Templates
 
-Create a new `.jinja` file in the `templates/` directory.
+| Template | Models | Features |
+|----------|--------|----------|
+| `granite-toolcall.jinja` | Granite 3.3, 4.1 | `<tool_call>`, `<think>`, `<response>` |
+| `apertus-4b-toolcall.jinja` | Apertus 4B | `<tool_call>` |
 
-**Template Requirements:**
-1. Must use `{{- bos_token -}}` at the start
-2. Must iterate over `messages` array
-3. Must handle: `system`, `user`, `assistant` roles
-4. For tool calling: Handle `tool_calls` array in assistant messages
-
-### Template Variables Available
+### Template Variables
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `messages` | array | Array of message objects |
-| `message['role']` | string | One of: system, user, assistant |
-| `message['content']` | string | Message text content |
-| `message['tool_calls']` | array | Tool calls (assistant only) |
-| `tool_call['function']['name']` | string | Tool/function name |
-| `tool_call['function']['arguments']` | string/object | Tool arguments |
-| `add_generation_prompt` | boolean | Whether to add generation prompt |
-| `bos_token` | string | Beginning-of-sequence token |
+| `messages` | array | Message objects |
+| `message['role']` | string | system/user/assistant |
+| `message['content']` | string | Text content |
+| `message['tool_calls']` | array | Tool calls |
+| `tool_call['function']` | object | Tool definition |
+| `bos_token` | string | BOS token |
+| `add_generation_prompt` | boolean | Add generation prompt? |
 
-### Example: Minimal Template
+### Creating Custom Templates
 
-```jinja
-{{- bos_token -}}
-{%- for message in messages -%}
-{%- if message['role'] == 'user' -%}
-{{- '<|im_start|>user\n' + message['content'] + '\n<|im_end|>\n' -}}
-{%- elif message['role'] == 'assistant' -%}
-{{- '<|im_start|>assistant\n' + message['content'] + '\n<|im_end|>\n' -}}
-{%- endif -%}
-{%- endfor -%}
-{%- if add_generation_prompt -%}
-{{- '<|im_start|>assistant\n' -}}
-{%- endif -%}
-```
+1. Create file in `templates/` directory
+2. Start with `{{- bos_token -}}`
+3. Iterate over `messages`
+4. Handle each role (system/user/assistant)
+5. For tool calls: Check `message.get('tool_calls')`
 
 ---
 
 ## Quantization Methods
 
-Henry supports all quantization methods available in `llama.cpp`:
-
-| Method | Size (4B) | Quality | Speed | Use Case |
-|--------|-----------|---------|-------|----------|
-| `Q4_0` | ~2.3 GB | Medium | Fast | General use |
-| **`Q4_K_M`** | **~2.5 GB** | **High** | **Fast** | **Recommended** |
-| `Q5_0` | ~2.8 GB | Higher | Medium | Better quality |
-| `Q5_K_M` | ~3.0 GB | Very High | Medium | High quality |
-| `Q6_K` | ~3.5 GB | Very High | Medium | High quality |
-| `Q8_0` | ~4.0 GB | Highest | Slow | Best quality |
-
-**Recommendation:** Use `Q4_K_M` for the best balance of size, quality, and speed.
+| Method | Size (8B) | Size (3B) | Quality | Speed | Recommended |
+|--------|-----------|-----------|---------|-------|-------------|
+| `Q4_0` | ~4.5 GB | ~1.7 GB | Medium | Fast | ❌ |
+| **`Q4_K_M`** | **~4.9 GB** | **~1.8 GB** | **High** | **Fast** | **✅** |
+| `Q5_0` | ~5.5 GB | ~2.0 GB | Higher | Medium | ❌ |
+| `Q5_K_M` | ~6.0 GB | ~2.2 GB | Very High | Medium | ❌ |
+| `Q6_K` | ~7.0 GB | ~2.5 GB | Very High | Medium | ❌ |
+| `Q8_0` | ~8.0 GB | ~3.0 GB | Highest | Slow | ❌ |
 
 ---
 
 ## Dependencies
 
-### System Dependencies
+### System
 
-| Tool | Purpose | Check |
-|------|---------|-------|
-| `make` | Build orchestration | `make --version` |
-| `git` | Version control, cloning | `git --version` |
-| `curl` | Download files | `curl --version` |
-| `bash` | Script execution | `bash --version` |
-| `python3` | Conversion scripts | `python3 --version` |
+| Tool | Check | Install |
+|------|-------|---------|
+| `make` | `make --version` | Xcode (macOS), `sudo apt install make` (Linux) |
+| `git` | `git --version` | `sudo apt install git` |
+| `curl` | `curl --version` | `sudo apt install curl` |
+| `python3` | `python3 --version` | `brew install python` / `sudo apt install python3` |
+| `uv` | `uv --version` | `pip install --user uv` (required for package management) |
 
-### Python Dependencies (for source conversion)
+### Python Packages
 
-```bash
-# Install required Python packages
-pip install transformers>=4.56.0 safetensors sentencepiece accelerate
-pip install huggingface_hub
-```
+**Automatic Installation**: Henry automatically creates a local Python virtual environment in the `.venv/` directory and installs all dependencies there when you run `make all` or `make python-deps`. This makes Henry **self-contained** - all Python packages are installed within the project directory.
 
-Or using `uv`:
-```bash
-uv pip install transformers>=4.56.0 safetensors sentencepiece accelerate
-uv pip install huggingface_hub
-```
+Required packages:
+- `torch` (PyTorch) - Installed from PyTorch CPU wheel repository
+- `transformers>=4.56.0`
+- `safetensors`
+- `sentencepiece`
+- `accelerate`
+- `huggingface_hub`
 
-### llama.cpp (auto-installed)
+The Makefile automatically uses the local venv's Python when running commands.
 
-Henry will automatically:
-1. Clone `llama.cpp` from GitHub if not present
-2. Build the required tools (`convert-hf-to-gguf.py`, `llama-quantize`)
+> **Note:** Henry requires `uv` for creating and managing the virtual environment. Install it first with `pip install --user uv` if you don't have it. The `.venv/` directory is added to `.gitignore` so it won't be committed to version control.
 
-To manually install:
+### llama.cpp
+
+Auto-installed by Henry. Manual install:
 ```bash
 cd henry
 git clone https://github.com/ggml-org/llama.cpp.git --depth 1
-cd llama.cpp
-make -j $(nproc)
-cd ..
+cd llama.cpp && make -j $(nproc)
+```
+
+---
+
+## Make Targets
+
+| Target | Description |
+|--------|-------------|
+| `make deps` | Check dependencies |
+| `make tools` | Download llamafile tools |
+| `make download` | Download/build GGUF |
+| `make convert` | Convert source to FP16 GGUF |
+| `make quantize` | Quantize FP16 to target |
+| `make package` | Package GGUF into Llamafile |
+| `make test` | Smoke-test Llamafile |
+| `make all` | Full build (tools + download + package) |
+| `make clean` | Clean build outputs |
+| `make help` | Show help |
+
+### Examples
+
+```bash
+# Pre-built Granite (fastest)
+make all MODEL=granite-3.3-8b
+
+# Source Granite 8B (full control)
+make all MODEL=granite-3.3-8b-source
+
+# Source Granite 3B (enhanced)
+make all MODEL=granite-4.1-3b-source
+
+# Source Apertus 4B (multilingual)
+make all MODEL=apertus-4b
 ```
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
-
-#### 1. Python Not Found
+### Python Not Found
 ```
 ERROR: python3 is required for conversion
 ```
-**Solution:** Install Python 3.8+
-```bash
-# macOS
-brew install python
+**Fix:** Install Python 3.8+
 
-# Ubuntu/Debian
-sudo apt install python3 python3-pip
+### uv Not Found
 ```
+ERROR: uv is required for package management
+```
+**Fix:** Install uv first: `pip install --user uv`
 
-#### 2. llama.cpp Build Failed
+### Local venv Creation Failed
+```
+ERROR: Failed to create venv
+```
+**Fix:** Ensure you have `uv` installed and that your system Python is working. Henry creates a `.venv/` directory in the project root. Make sure you have write permissions in the Henry directory.
+
+### Python Dependencies Missing
+```
+MISSING: torch
+MISSING: transformers
+```
+**Fix:** Run `make python-deps` or `make all`. Henry will automatically create a local venv in `.venv/` and install all missing packages there. The Makefile automatically uses the venv's Python for all commands.
+
+### llama.cpp Build Failed
 ```
 ERROR: Failed to build llama-quantize
 ```
-**Solution:** Install build dependencies
+**Fix:** Install build tools: `sudo apt install build-essential cmake` (Linux) or `xcode-select --install` (macOS)
+
+### Model Download Failed
+```
+ERROR: Failed to download...
+```
+**Fix:** Check `hf whoami`, accept model terms, install `hf` CLI: `uv tool install huggingface_hub[cli]`
+
+### Out of Disk Space
+**Fix:** Need ~20-25 GB for source conversion. Clear with `rm -rf models-cache/`
+
+### Template Not Found
+**Fix:** Verify `ls templates/`, check YAML `chat_template` path
+
+---
+
+## Directory Structure
+
+```
+henry/
+├── .venv/                          # Local Python virtual environment (gitignored)
+│   └── bin/python3                  # Venv Python with all dependencies
+├── models/
+│   ├── granite-3.3-8b.yaml           # Pre-built
+│   ├── granite-3.3-8b-source.yaml    # Source conversion
+│   ├── granite-4.1-3b-source.yaml    # Source conversion
+│   └── apertus-4b.yaml                # Source conversion
+├── templates/
+│   ├── granite-toolcall.jinja        # For Granite
+│   └── apertus-4b-toolcall.jinja      # For Apertus
+├── scripts/
+│   ├── check-python-deps.sh          # Check/install Python dependencies
+│   ├── convert-model.sh              # Convert source to GGUF
+│   ├── quantize-model.sh             # Quantize GGUF
+│   └── download-model.sh             # Download/build models
+├── models-cache/
+│   └── <model>/
+│       ├── source/                  # Source files
+│       └── *.gguf                   # GGUF files
+├── llamafiles/
+│   └── *.llamafile                  # Output
+├── Makefile                         # Build system
+└── Guided-GGUF-Conversion.md        # This guide
+```
+
+---
+
+## Adding New Models
+
+### Pre-built GGUF
 ```bash
-# Ubuntu/Debian
-sudo apt install build-essential cmake
-
-# macOS (with Xcode CLI tools)
-xcode-select --install
+cp models/granite-3.3-8b.yaml models/new.yaml
+# Edit: name, hf_repo, gguf_file, output
+make all MODEL=new
 ```
 
-#### 3. Model Download Failed
+### Source Conversion
+```bash
+cp models/granite-3.3-8b-source.yaml models/new.yaml
+# Edit: name, hf_repo, chat_template, etc.
+cp templates/granite-toolcall.jinja templates/new.jinja
+# Edit template as needed
+make all MODEL=new
 ```
-ERROR: Failed to download swiss-ai/Apertus-v1.1-4B-Instruct
-```
-**Solution:**
-- Check HuggingFace login: `hf whoami`
-- Accept model terms if required: Visit the model page on HuggingFace
-- Ensure `hf` CLI is installed: `uv tool install huggingface_hub[cli]`
-
-#### 4. Out of Disk Space
-```
-No space left on device
-```
-**Solution:**
-- 4B model source: ~8 GB
-- FP16 GGUF: ~8 GB
-- Quantized GGUF: ~2.5-3 GB
-- **Total temporary space needed: ~20 GB**
-- Clear cache: `rm -rf models-cache/`
-
-#### 5. Template Not Found
-```
-ERROR: Template not found: templates/apertus-4b-toolcall.jinja
-```
-**Solution:**
-- Verify template exists: `ls templates/`
-- Check YAML `chat_template` field
-- Ensure path is relative to Henry root
-
-#### 6. Conversion Failed
-```
-ERROR: Conversion failed, output file not created
-```
-**Solution:**
-- Check `convert-hf-to-gguf.py` logs
-- Verify model source files are complete
-- Try with a smaller model first (e.g., 0.5B Apertus)
 
 ---
 
-## Adding a New Model
+## FAQ
 
-### For Pre-built GGUF Models (like Granite)
+**Q: Pre-built vs Source conversion?**
+A: Pre-built is faster (downloads ready GGUF). Source gives full control (custom templates, extended context).
 
-1. **Create config file:**
-   ```bash
-   cp models/granite-3.3-8b.yaml models/new-model.yaml
-   ```
+**Q: Which Granite to use?**
+A: Use both! Keep `granite-3.3-8b.yaml` for quick deployment and `granite-3.3-8b-source.yaml` for full control.
 
-2. **Edit the config:**
-   ```yaml
-   name: new-model
-display_name: "New Model"
-hf_repo: org/new-model-GGUF
-gguf_file: new-model-Q4_K_M.gguf
-output: new-model-Q4_K_M.llamafile
-   ```
+**Q: Where is Granite 4B?**
+A: IBM doesn't have a text-only 4B Granite. Use `granite-4.1-3b-source.yaml` (3B) or wait for official 4B release.
 
-3. **Build:**
-   ```bash
-   make all MODEL=new-model
-   ```
-
-### For Source Conversion Models (like Apertus)
-
-1. **Create config file:**
-   ```bash
-   cp models/apertus-4b.yaml models/new-model.yaml
-   ```
-
-2. **Edit the config:**
-   ```yaml
-   name: new-model
-display_name: "New Model"
-hf_repo: org/new-model
-source_type: safetensors
-convert: true
-quantization: Q4_K_M
-context_length: 32768
-chat_template: templates/new-model.jinja
-gguf_file: new-model-Q4_K_M.gguf
-output: new-model-Q4_K_M.llamafile
-   ```
-
-3. **Create custom template:**
-   ```bash
-   cp templates/apertus-4b-toolcall.jinja templates/new-model.jinja
-   # Edit template for your model's tokenizer
-   ```
-
-4. **Build:**
-   ```bash
-   make all MODEL=new-model
-   ```
-
----
-
-## Model Comparison
-
-| Model | Size | Source | Features | Notes |
-|-------|------|--------|----------|-------|
-| Granite 3.3 8B | 8B | Pre-built GGUF | Tool calling, Function calling | IBM model, ready to use |
-| Apertus 4B | 4B | Source conversion | Tool calling, Embedding, Tagged | Swiss-AI, multilingual |
-| Apertus 8B | 8B | Source conversion | Tool calling, Embedding, Tagged | Swiss-AI, multilingual |
-
-### Granite vs Apertus
-
-| Feature | Granite 3.3 8B | Apertus 4B |
-|---------|----------------|------------|
-| **Parameters** | 8B | 4B |
-| **Context Length** | 8192 | 32768 |
-| **Languages** | English-focused | 1811 languages |
-| **Tool Calling** | ✅ Baked in | ✅ Custom template |
-| **Embedding** | ✅ | ✅ |
-| **Size (Q4_K_M)** | ~4.9 GB | ~2.5-3 GB |
-| **RAM Usage** | ~6 GB | ~4-6 GB |
-| **Compliance** | IBM | EU AI Act |
-| **Source** | Pre-built | Convert from source |
-
----
-
-## References
-
-- [Henry Repository](https://github.com/rsdoiel/henry) (hypothetical)
-- [llama.cpp](https://github.com/ggml-org/llama.cpp)
-- [Apertus Models](https://huggingface.co/swiss-ai)
-- [Granite Models](https://huggingface.co/ibm-granite)
-- [GGUF Format](https://github.com/ggml-org/gguf)
+**Q: How to test tool calling?**
+A: Start server: `./llamafiles/model.llamafile --server --port 8080` then send request with `tools` array.
 
 ---
 
 ## Appendix: Manual Commands
 
-If you need to run steps manually (for debugging):
-
-### For Apertus (Source Conversion)
+### Granite 3.3 8B Source
 
 ```bash
-# 1. Download source model
-HF_REPO="swiss-ai/Apertus-v1.1-4B-Instruct"
-MODEL_DIR="models-cache/apertus-4b/source"
-mkdir -p "$MODEL_DIR"
-hf download "$HF_REPO" --local-dir "$MODEL_DIR" --local-dir-use-symlinks False
+# 1. Download source
+mkdir -p models-cache/granite-3.3-8b-source/source
+hf download ibm-granite/granite-3.3-8b-instruct \
+  --local-dir models-cache/granite-3.3-8b-source/source
 
 # 2. Convert to FP16 GGUF
 python3 llama.cpp/convert-hf-to-gguf.py \
-    "$MODEL_DIR" \
-    models-cache/apertus-4b/apertus-4b.fp16.gguf \
-    --outtype f16 \
-    --chat-template-file templates/apertus-4b-toolcall.jinja \
-    --context-length 32768
+  models-cache/granite-3.3-8b-source/source \
+  models-cache/granite-3.3-8b-source/granite-3.3-8b.fp16.gguf \
+  --outtype f16 \
+  --chat-template-file templates/granite-toolcall.jinja \
+  --context-length 122880
 
-# 3. Quantize to Q4_K_M
+# 3. Quantize
 ./llama.cpp/build/bin/llama-quantize \
-    models-cache/apertus-4b/apertus-4b.fp16.gguf \
-    models-cache/apertus-4b/apertus-4b-instruct-Q4_K_M.gguf \
-    Q4_K_M
+  models-cache/granite-3.3-8b-source/granite-3.3-8b.fp16.gguf \
+  models-cache/granite-3.3-8b-source/granite-3.3-8b-Q4_K_M.gguf \
+  Q4_K_M
 
-# 4. Package into Llamafile
-cp tools/llamafile llamafiles/apertus-4b-Q4_K_M.llamafile
-zipalign -j0 llamafiles/apertus-4b-Q4_K_M.llamafile \
-    models-cache/apertus-4b/apertus-4b-instruct-Q4_K_M.gguf
-chmod +x llamafiles/apertus-4b-Q4_K_M.llamafile
-```
-
-### For Granite (Pre-built GGUF)
-
-```bash
-# 1. Download pre-built GGUF
-HF_REPO="ibm-granite/granite-3.3-8b-instruct-GGUF"
-GGUF_FILE="granite-3.3-8b-instruct-Q4_K_M.gguf"
-mkdir -p models-cache/granite-3.3-8b
-hf download "$HF_REPO" "$GGUF_FILE" --local-dir models-cache/granite-3.3-8b
-
-# 2. Package into Llamafile
-cp tools/llamafile llamafiles/granite-3.3-8b-Q4_K_M.llamafile
-zipalign -j0 llamafiles/granite-3.3-8b-Q4_K_M.llamafile \
-    models-cache/granite-3.3-8b/$GGUF_FILE
-chmod +x llamafiles/granite-3.3-8b-Q4_K_M.llamafile
+# 4. Package
+cp tools/llamafile llamafiles/granite-3.3-8b-source-Q4_K_M.llamafile
+zipalign -j0 llamafiles/granite-3.3-8b-source-Q4_K_M.llamafile \
+  models-cache/granite-3.3-8b-source/granite-3.3-8b-Q4_K_M.gguf
+chmod +x llamafiles/granite-3.3-8b-source-Q4_K_M.llamafile
 ```
 
 ---
 
-*Last updated: June 2026*
+## References
+
+- [IBM Granite Models](https://huggingface.co/ibm-granite)
+- [Swiss-AI Apertus Models](https://huggingface.co/swiss-ai)
+- [llama.cpp](https://github.com/ggml-org/llama.cpp)
+- [GGUF Format](https://github.com/ggml-org/gguf)
+
+---
+
+*Last updated: June 22, 2026*
+*Henry version: 0.0.2*

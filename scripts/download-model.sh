@@ -20,7 +20,7 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 # Parse YAML fields with grep (no yq dependency)
-field() { grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | tr -d '"' | tr -d "'" ; }
+field() { grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | tr -d '"' | tr -d "'" || echo ""; }
 
 MODEL_NAME="$(field name)"
 HF_REPO="$(field hf_repo)"

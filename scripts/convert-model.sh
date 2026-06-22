@@ -20,7 +20,7 @@ fi
 
 # Parse YAML fields with grep (no yq dependency)
 field() { 
-    grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | sed 's/^[\"'\'']//' | sed 's/[\"'\'']$//' | tr -d '"' | tr -d "'"
+    grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | sed 's/^[\"'\'']//' | sed 's/[\"'\'']$//' | tr -d '"' | tr -d "'" || echo ""
 }
 
 MODEL_NAME="$(field name)"
@@ -53,6 +53,14 @@ if ! command -v python3 &>/dev/null; then
     exit 1
 fi
 
+# Check for required Python packages
+if ! python3 -c "import torch" 2>/dev/null; then
+    echo "ERROR: PyTorch is required for conversion"
+    echo "Install: pip install torch --extra-index-url https://download.pytorch.org/whl/cpu"
+    echo "Or: uv pip install torch --extra-index-url https://download.pytorch.org/whl/cpu"
+    exit 1
+fi
+
 # Check if template exists
 if [ ! -f "${ROOT}/${TEMPLATE_FILE}" ]; then
     echo "ERROR: Template not found: ${ROOT}/${TEMPLATE_FILE}"
@@ -74,7 +82,7 @@ fi
 
 # Download source model
 echo "Downloading source model from ${HF_REPO}..."
-if ! hf download "${HF_REPO}" --local-dir "${SOURCE_DIR}" --local-dir-use-symlinks False; then
+if ! hf download "${HF_REPO}" --local-dir "${SOURCE_DIR}"; then
     echo "ERROR: Failed to download ${HF_REPO}"
     exit 1
 fi
@@ -83,7 +91,7 @@ echo "Downloaded to: ${SOURCE_DIR}"
 echo ""
 
 # Check if llama.cpp conversion tools are available
-CONVERT_SCRIPT="${ROOT}/llama.cpp/convert-hf-to-gguf.py"
+CONVERT_SCRIPT="${ROOT}/llama.cpp/convert_hf_to_gguf.py"
 if [ ! -f "$CONVERT_SCRIPT" ]; then
     echo "llama.cpp not found at ${ROOT}/llama.cpp/"
     echo "Cloning llama.cpp..."
@@ -94,22 +102,73 @@ if [ ! -f "$CONVERT_SCRIPT" ]; then
     fi
 fi
 
-# Convert to FP16 GGUF with custom template
+# Convert to FP16 GGUF
 echo "Converting to FP16 GGUF..."
 ABS_TEMPLATE="$(cd "${ROOT}" && pwd)/${TEMPLATE_FILE}"
 
+# Convert the model to FP16 GGUF
+# Note: chat template and context length are added via metadata after conversion
 python3 "${CONVERT_SCRIPT}" \
     "${SOURCE_DIR}" \
-    "${FP16_GGUF}" \
-    --outtype f16 \
-    --chat-template-file "${ABS_TEMPLATE}" \
-    --context-length "${CONTEXT_LENGTH}" \
-    --vocab-only False
+    --outfile "${FP16_GGUF}" \
+    --outtype f16
 
 if [ ! -f "${FP16_GGUF}" ]; then
     echo "ERROR: Conversion failed, output file not created"
     exit 1
 fi
+
+echo ""
+echo "Base GGUF created: ${FP16_GGUF}"
+
+# Add custom chat template using gguf_new_metadata.py
+METADATA_SCRIPT="${ROOT}/llama.cpp/gguf-py/gguf/scripts/gguf_new_metadata.py"
+SET_METADATA_SCRIPT="${ROOT}/llama.cpp/gguf-py/gguf/scripts/gguf_set_metadata.py"
+
+# Create a temporary file for intermediate steps
+TMP_GGUF="${FP16_GGUF}.tmp"
+cp "${FP16_GGUF}" "${TMP_GGUF}"
+
+# Add chat template if available
+if [ -f "${METADATA_SCRIPT}" ] && [ -f "${ABS_TEMPLATE}" ]; then
+    echo "Adding custom chat template..."
+    python3 "${METADATA_SCRIPT}" \
+        "${TMP_GGUF}" \
+        "${TMP_GGUF}.2" \
+        --chat-template-file "${ABS_TEMPLATE}" \
+        --force
+    
+    if [ -f "${TMP_GGUF}.2" ]; then
+        mv "${TMP_GGUF}.2" "${TMP_GGUF}"
+        echo "Chat template added successfully"
+    else
+        echo "ERROR: Failed to update metadata with chat template"
+        exit 1
+    fi
+fi
+
+# Set custom context length if specified
+if [ -n "${CONTEXT_LENGTH}" ] && [ "${CONTEXT_LENGTH}" != "0" ] && [ -f "${SET_METADATA_SCRIPT}" ]; then
+    echo "Setting context length to ${CONTEXT_LENGTH}..."
+    # Determine architecture for the context length key
+    # Try common architectures
+    for arch in llama mistral granite qwen; do
+        python3 "${SET_METADATA_SCRIPT}" \
+            "${TMP_GGUF}" \
+            "${arch}.context_length" \
+            "${CONTEXT_LENGTH}" \
+            --force 2>/dev/null && break
+    done
+    
+    if [ ! -f "${TMP_GGUF}" ]; then
+        echo "ERROR: Failed to set context length"
+        exit 1
+    fi
+    echo "Context length set successfully"
+fi
+
+# Move final file
+mv "${TMP_GGUF}" "${FP16_GGUF}"
 
 echo ""
 echo "FP16 GGUF created: ${FP16_GGUF}"

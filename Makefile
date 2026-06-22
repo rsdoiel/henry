@@ -6,15 +6,19 @@ MODEL ?= granite-3.3-8b
 CONFIG = models/$(MODEL).yaml
 OUTPUT = $(shell grep '^output:' $(CONFIG) 2>/dev/null | sed 's/output:[[:space:]]*//' | tr -d '"')
 
-.PHONY: all tools deps download convert quantize package test clean help
+# Use local Python venv if it exists
+export PATH := .venv/bin:$(PATH)
 
-all: tools download package
+.PHONY: all tools deps python-deps download convert quantize package test clean help
+
+all: tools python-deps download package
 
 help:
 	@echo "henry — llamafile factory"
 	@echo ""
 	@echo "Targets:"
-	@echo "  make deps              Check all required tools are installed"
+	@echo "  make deps              Check all required system tools are installed"
+	@echo "  make python-deps       Check/install Python dependencies (PyTorch, etc.)"
 	@echo "  make tools             Download llamafile + zipalign binaries"
 	@echo "  make download          Download or build GGUF for MODEL (default: $(MODEL))"
 	@echo "  make convert           Convert HF model to FP16 GGUF with custom template"
@@ -29,11 +33,14 @@ help:
 	@echo "  LLAMAFILE_VERSION=$(LLAMAFILE_VERSION)"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make all MODEL=granite-3.3-8b"
-	@echo "  make all MODEL=apertus-4b"
+	@echo "  make all MODEL=granite-3.3-8b      # Pre-built GGUF (no PyTorch needed)"
+	@echo "  make all MODEL=apertus-4b           # Source conversion (requires PyTorch)"
 
 deps:
 	@bash scripts/check-deps.sh
+
+python-deps:
+	@bash scripts/check-python-deps.sh
 
 tools: deps
 	@LLAMAFILE_VERSION=$(LLAMAFILE_VERSION) bash scripts/download-tools.sh
@@ -41,10 +48,10 @@ tools: deps
 download: deps
 	@bash scripts/download-model.sh $(CONFIG)
 
-convert: deps
+convert: deps python-deps
 	@bash scripts/convert-model.sh $(CONFIG)
 
-quantize: deps
+quantize: deps python-deps
 	@bash scripts/quantize-model.sh $(CONFIG)
 
 package:

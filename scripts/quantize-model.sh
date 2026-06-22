@@ -19,7 +19,7 @@ fi
 
 # Parse YAML fields
 field() { 
-    grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | sed 's/^[\"'\'']//' | sed 's/[\"'\'']$//' | tr -d '"' | tr -d "'"
+    grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | sed 's/^[\"'\'']//' | sed 's/[\"'\'']$//' | tr -d '"' | tr -d "'" || echo ""
 }
 
 MODEL_NAME="$(field name)"
@@ -54,14 +54,16 @@ if [ -f "${QUANT_GGUF}" ]; then
     exit 0
 fi
 
-# Build llama.cpp quantize tool if needed
+# Build llama.cpp quantize tool if needed (CMake-only build since llama.cpp dropped Makefile)
 QUANTIZE_BIN="${ROOT}/llama.cpp/build/bin/llama-quantize"
 if [ ! -f "$QUANTIZE_BIN" ]; then
     echo "llama-quantize not found at ${QUANTIZE_BIN}"
-    echo "Building llama.cpp..."
-    cd "${ROOT}/llama.cpp"
-    make -j "$(nproc)" llama-quantize
-    cd "$ROOT"
+    echo "Building llama.cpp with CMake (this takes a few minutes)..."
+    cmake -B "${ROOT}/llama.cpp/build" -S "${ROOT}/llama.cpp" \
+        -DLLAMA_BUILD_TESTS=OFF \
+        -DLLAMA_BUILD_EXAMPLES=OFF \
+        -DCMAKE_BUILD_TYPE=Release
+    cmake --build "${ROOT}/llama.cpp/build" --target llama-quantize -j "$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
     if [ ! -f "$QUANTIZE_BIN" ]; then
         echo "ERROR: Failed to build llama-quantize"
         exit 1

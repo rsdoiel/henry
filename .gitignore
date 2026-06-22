@@ -4,3 +4,5 @@ llamafiles/
 *.gguf
 *.llamafile
 .env
+.venv/
+llama.cpp/

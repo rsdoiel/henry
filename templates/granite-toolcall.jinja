@@ -1,23 +1,24 @@
-{%- set ns = namespace(prev_role=None) -%}
 {{- bos_token -}}
 {%- for message in messages -%}
     {%- set role = message['role'] -%}
-    
+
     {%- if role == 'system' -%}
         {{- '<|im_start|>system\n' -}}
         {{- message['content'] | trim -}}
         {{- '\n<|im_end|>\n' -}}
-        {%- set ns.prev_role = 'system' -%}
-    
+
     {%- elif role == 'user' -%}
         {{- '<|im_start|>user\n' -}}
         {{- message['content'] | trim -}}
         {{- '\n<|im_end|>\n' -}}
-        {%- set ns.prev_role = 'user' -%}
-    
+
+    {%- elif role == 'tool' -%}
+        {{- '<|im_start|>tool\n' -}}
+        {{- message['content'] | trim -}}
+        {{- '\n<|im_end|>\n' -}}
+
     {%- elif role == 'assistant' -%}
         {{- '<|im_start|>assistant\n' -}}
-        
         {%- if message.get('tool_calls') -%}
             {%- for tool_call in message['tool_calls'] -%}
 {{- '<tool_call>\n' -}}
@@ -29,25 +30,11 @@
 {{- '</tool_call>\n' -}}
             {%- endfor -%}
         {%- endif -%}
-        
         {%- if message.get('content') -%}
-            {%- if ns.prev_role != 'user' -%}
-{{- '<think>' -}}
-            {%- endif -%}
 {{- message['content'] | trim -}}
-            {%- if ns.prev_role != 'user' -%}
-{{- '</think>\n' -}}
-{{- '<response>' -}}
-            {%- endif -%}
         {%- endif -%}
-        
-        {%- if ns.prev_role != 'user' -%}
-{{- '</response>\n' -}}
-        {%- endif -%}
-        
         {{- '\n<|im_end|>\n' -}}
-        {%- set ns.prev_role = 'assistant' -%}
-    
+
     {%- endif -%}
 {%- endfor -%}
 {%- if add_generation_prompt -%}

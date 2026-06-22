@@ -1,44 +1,57 @@
-{%- set ns = namespace(prev_role=None) -%}
+{%- set ns = namespace(loop_messages=[]) -%}
 {{- bos_token -}}
-{%- for message in messages -%}
+{%- if messages and messages[0]['role'] == 'system' -%}
+    {{- '<SPECIAL_61>' -}}
+    {{- messages[0]['content'] | trim -}}
+    {{- '<SPECIAL_62>' -}}
+    {%- set ns.loop_messages = messages[1:] -%}
+{%- else -%}
+    {{- '<SPECIAL_61><SPECIAL_62>' -}}
+    {%- set ns.loop_messages = messages -%}
+{%- endif -%}
+{{- '<SPECIAL_63>' -}}
+{{- 'Deliberation: enabled\n' -}}
+{%- if tools -%}
+    {{- 'Tool Capabilities:\n' -}}
+    {%- for tool in tools -%}
+        {{- tool | tojson -}}
+        {%- if not loop.last -%}{{- '\n' -}}{%- endif -%}
+    {%- endfor -%}
+{%- else -%}
+    {{- 'Tool Capabilities: disabled' -}}
+{%- endif -%}
+{{- '<SPECIAL_64>' -}}
+{%- for message in ns.loop_messages -%}
     {%- set role = message['role'] -%}
-    
-    {%- if role == 'system' -%}
-        {{- '<|im_start|>system\n' -}}
+    {%- if role == 'user' -%}
+        {{- '<SPECIAL_65>' -}}
         {{- message['content'] | trim -}}
-        {{- '\n<|im_end|>\n' -}}
-        {%- set ns.prev_role = 'system' -%}
-    
-    {%- elif role == 'user' -%}
-        {{- '<|im_start|>user\n' -}}
+        {{- '<SPECIAL_66>' -}}
+    {%- elif role == 'tool' -%}
+        {{- '<SPECIAL_65>' -}}
+        {{- 'Tool result' -}}
+        {%- if message.get('tool_call_id') -%}
+            {{- ' [' + message['tool_call_id'] + ']' -}}
+        {%- endif -%}
+        {{- ': ' -}}
         {{- message['content'] | trim -}}
-        {{- '\n<|im_end|>\n' -}}
-        {%- set ns.prev_role = 'user' -%}
-    
+        {{- '<SPECIAL_66>' -}}
     {%- elif role == 'assistant' -%}
-        {{- '<|im_start|>assistant\n' -}}
-        
+        {{- '<SPECIAL_67>' -}}
         {%- if message.get('tool_calls') -%}
-            {%- for tool_call in message['tool_calls'] -%}
-{{- '<tool_call>\n' -}}
-{{- '{\n' -}}
-{{- '  "id": "' + tool_call.get('id', 'call_' + loop.index|string) + '",\n' -}}
-{{- '  "name": "' + tool_call['function']['name'] + '",\n' -}}
-{{- '  "arguments": ' + tool_call['function']['arguments']|string + '\n' -}}
-{{- '}\n' -}}
-{{- '</tool_call>\n' -}}
+            {{- '<SPECIAL_71>[' -}}
+            {%- for tc in message['tool_calls'] -%}
+                {{- '{"' + tc['function']['name'] + '": ' + tc['function']['arguments']|string + '}' -}}
+                {%- if not loop.last -%}{{- ', ' -}}{%- endif -%}
             {%- endfor -%}
+            {{- ']<SPECIAL_72>' -}}
         {%- endif -%}
-        
         {%- if message.get('content') -%}
-{{- message['content'] | trim -}}
+            {{- message['content'] | trim -}}
         {%- endif -%}
-        
-        {{- '\n<|im_end|>\n' -}}
-        {%- set ns.prev_role = 'assistant' -%}
-    
+        {{- '<SPECIAL_68>' -}}
     {%- endif -%}
 {%- endfor -%}
 {%- if add_generation_prompt -%}
-    {{- '<|im_start|>assistant\n' -}}
+    {{- '<SPECIAL_67>' -}}
 {%- endif -%}
