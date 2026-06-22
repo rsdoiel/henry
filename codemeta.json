@@ -1,0 +1,35 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "henry",
+  "version": "0.0.1",
+  "description": "A factory for building Llamafiles from open models on Hugging Face",
+  "programmingLanguage": ["bash", "make"],
+  "softwareRequirements": [
+    "uv >= 0.10",
+    "make",
+    "git"
+  ],
+  "softwareSuggestions": [
+    "huggingface_hub[cli]"
+  ],
+  "codeRepository": "",
+  "license": "https://spdx.org/licenses/AGPL-3.0-or-later.html",
+  "developmentStatus": "active",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "R. S.",
+      "familyName": "Doiel",
+      "email": "rsdoiel@gmail.com"
+    }
+  ],
+  "copyrightHolder": [
+    {
+      "@type": "Person",
+      "givenName": "R. S.",
+      "familyName": "Doiel"
+    }
+  ],
+  "releaseNotes": "Initial scaffolding; first target is Granite 3.3 8B Q4_K_M"
+}

@@ -1,0 +1,6 @@
+tools/
+models-cache/
+llamafiles/
+*.gguf
+*.llamafile
+.env

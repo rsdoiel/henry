@@ -1,0 +1,24 @@
+
+# Explore the creation of Llamafile models
+
+Llamafiles is a way of distributing language models, regardless of computer system, developed by [Mozilla AI](). They are documented at [Docs Mozilla AI](). The project provides some basic pre-built models which work well with Harvey. Llamafile adoption, including by Harvey, would improve if there are more choices. Henry is my project about creating a factory for generating Llamafiles from open models currently available at Hugging Face.
+
+## Initial Models
+
+There are several models I am interested in generating.
+
+- Apertus with a 4B parameter configuration
+- Granite models that are target to specific programming language
+
+## What Henry provides
+
+Henry is a tool to set things up and orchestrate the conversion of a language model to GUFF format then to Llamafile.
+
+Most models are Python based so we need to use Python for some of the processing too. We do this by running Python via uv tool.
+
+The tool will will check to see of all programs necessary to complete the process are available (example uv, make, cmake, compilers and build utilities) which may be needed)
+
+For a given model it will retrieve the model sources necessary to do the model to GUFF conversion.
+
+It then will convert the model to GUFF with the specific parameters or contraints desired for the final version. It then will take the GUFF version and compile it to the Llamafile format.
+
