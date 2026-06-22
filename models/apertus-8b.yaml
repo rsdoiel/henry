@@ -1,0 +1,30 @@
+# Swiss-AI Apertus 8B Instruct with Tool Support
+name: apertus-8b
+display_name: "Swiss-AI Apertus 8B Instruct"
+hf_repo: swiss-ai/Apertus-8B-Instruct-2509
+source_type: safetensors
+
+# Build from source
+convert: true
+quantization: Q4_K_M
+context_length: 32768
+chat_template: templates/apertus-4b-toolcall.jinja
+
+# Output files
+gguf_file: apertus-8b-instruct-Q4_K_M.gguf
+output: apertus-8b-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+  - embedding
+  - tagged
+
+# Metadata
+kind: instruct
+ram_gb: 6
+notes: >
+  Source model from which Apertus-v1.1-4B was distilled.
+  Shares the same tokenizer and <SPECIAL_XX> token format as the 4B —
+  the same chat template applies to both.
+  Supports 1811 languages and is EU AI Act compliant.
