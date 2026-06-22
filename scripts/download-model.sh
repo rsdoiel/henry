@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Downloads a GGUF from HuggingFace given a model config YAML.
+# Downloads or converts a model to GGUF given a model config YAML.
+# For models with convert: true, builds GGUF from source.
+# For models with convert: false (or missing), downloads pre-built GGUF.
 # Usage: download-model.sh <models/foo.yaml>
 set -euo pipefail
 
@@ -18,14 +20,16 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 # Parse YAML fields with grep (no yq dependency)
-field() { grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | tr -d '"'; }
+field() { grep -E "^${1}:" "$CONFIG" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | tr -d '"' | tr -d "'" ; }
 
+MODEL_NAME="$(field name)"
 HF_REPO="$(field hf_repo)"
 GGUF_FILE="$(field gguf_file)"
-MODEL_NAME="$(field name)"
+CONVERT="$(field convert)"
 DEST_DIR="${CACHE_DIR}/${MODEL_NAME}"
+FINAL_GGUF="${DEST_DIR}/${GGUF_FILE}"
 
-echo "=== Downloading ${MODEL_NAME} ==="
+echo "=== Downloading/Converting ${MODEL_NAME} ==="
 echo "  Repo:  ${HF_REPO}"
 echo "  File:  ${GGUF_FILE}"
 echo "  Into:  ${DEST_DIR}"
@@ -33,13 +37,38 @@ echo ""
 
 mkdir -p "$DEST_DIR"
 
-if [ -f "${DEST_DIR}/${GGUF_FILE}" ]; then
-    echo "Already present: ${DEST_DIR}/${GGUF_FILE}"
+# Check if already have the final GGUF
+if [ -f "$FINAL_GGUF" ]; then
+    echo "Already present: ${FINAL_GGUF}"
     exit 0
 fi
 
-hf download "$HF_REPO" "$GGUF_FILE" --local-dir "$DEST_DIR"
-
-echo ""
-echo "Downloaded: ${DEST_DIR}/${GGUF_FILE}"
-ls -lh "${DEST_DIR}/${GGUF_FILE}"
+# Check if conversion is enabled
+if [ "$CONVERT" = "true" ]; then
+    echo "Building from source (convert=true)..."
+    echo ""
+    
+    # Run conversion and quantization
+    if ! bash "${ROOT}/scripts/convert-model.sh" "$CONFIG"; then
+        echo "ERROR: Conversion failed"
+        exit 1
+    fi
+    
+    if ! bash "${ROOT}/scripts/quantize-model.sh" "$CONFIG"; then
+        echo "ERROR: Quantization failed"
+        exit 1
+    fi
+    
+    echo ""
+    echo "Build complete: ${FINAL_GGUF}"
+    ls -lh "$FINAL_GGUF"
+else
+    # Original behavior: download pre-built GGUF
+    echo "Downloading pre-built GGUF..."
+    
+    hf download "$HF_REPO" "$GGUF_FILE" --local-dir "$DEST_DIR"
+    
+    echo ""
+    echo "Downloaded: ${FINAL_GGUF}"
+    ls -lh "$FINAL_GGUF"
+fi

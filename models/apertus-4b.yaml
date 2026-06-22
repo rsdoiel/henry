@@ -1,0 +1,30 @@
+# Swiss-AI Apertus 4B Instruct with Tool Support
+name: apertus-4b
+display_name: "Swiss-AI Apertus 4B Instruct"
+hf_repo: swiss-ai/Apertus-v1.1-4B-Instruct
+source_type: safetensors
+
+# Build from source
+convert: true
+quantization: Q4_K_M
+context_length: 32768
+chat_template: templates/apertus-4b-toolcall.jinja
+
+# Output files
+gguf_file: apertus-4b-instruct-Q4_K_M.gguf
+output: apertus-4b-Q4_K_M.llamafile
+
+# Features to bake into GGUF
+features:
+  - tool_calling
+  - embedding
+  - tagged
+
+# Metadata
+kind: instruct
+ram_gb: 2
+notes: >
+  Built from source with custom chat template supporting
+  tool calling (<tool_call> tags), embedding, and tagged content.
+  Model supports 1811 languages and is EU AI Act compliant.
+  Based on Apertus-v1.1-4B-Instruct (distilled from Apertus-8B-2509).

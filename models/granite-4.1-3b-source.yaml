@@ -1,0 +1,33 @@
+# IBM Granite 4.1 3B Instruct - Built from Source
+name: granite-4.1-3b-source
+display_name: "IBM Granite 4.1 3B Instruct (Source)"
+hf_repo: ibm-granite/granite-4.1-3b
+source_type: safetensors
+
+# Build from source with custom template
+convert: true
+quantization: Q4_K_M
+context_length: 131072
+chat_template: templates/granite-toolcall.jinja
+
+# Output files
+gguf_file: granite-4.1-3b-instruct-Q4_K_M.gguf
+output: granite-4.1-3b-source-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+  - embedding
+  - tagged
+  - function_calling
+
+# Metadata
+kind: instruct
+ram_gb: 2
+notes: >
+  Built from source with custom chat template supporting
+  tool calling, embedding, and tagged content.
+  Granite 4.1 model with enhanced tool calling capabilities.
+  Extended to full 128K+ context length (131072 tokens).
+  Supports multilingual generation, coding, RAG, and AI assistant workflows.
+  Based on ibm-granite/granite-4.1-3b source model.

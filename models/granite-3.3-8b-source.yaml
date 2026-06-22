@@ -1,0 +1,32 @@
+# IBM Granite 3.3 8B Instruct - Built from Source
+name: granite-3.3-8b-source
+display_name: "IBM Granite 3.3 8B Instruct (Source)"
+hf_repo: ibm-granite/granite-3.3-8b-instruct
+source_type: safetensors
+
+# Build from source with custom template
+convert: true
+quantization: Q4_K_M
+context_length: 122880
+chat_template: templates/granite-toolcall.jinja
+
+# Output files
+gguf_file: granite-3.3-8b-instruct-Q4_K_M.gguf
+output: granite-3.3-8b-source-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+  - embedding
+  - tagged
+  - function_calling
+
+# Metadata
+kind: instruct
+ram_gb: 6
+notes: >
+  Built from source with custom chat template supporting
+  tool calling, embedding, and tagged content.
+  Original model supports <think> and <response> tags for structured reasoning.
+  Extended to full 128K context length (122880 tokens).
+  Based on ibm-granite/granite-3.3-8b-instruct source model.
