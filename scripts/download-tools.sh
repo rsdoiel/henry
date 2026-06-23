@@ -44,6 +44,6 @@ echo "  $(${TOOLS_DIR}/llamafile --version 2>&1 | head -1 || true)"
 if [ "$ARCH" = "aarch64" ] && [ "$OS" = "Linux" ]; then
     echo ""
     echo "NOTE (aarch64 Linux): To run APE binaries, register the format once:"
-    echo "  sudo sh -c \"echo ':APE:M::MZqFpD::/proc/sys/fs/binfmt_misc/APE:' > /proc/sys/fs/binfmt_misc/register\""
+    echo "  sudo sh -c \"echo ':APE:M::MZqFpD::/bin/sh:' > /proc/sys/fs/binfmt_misc/register\""
     echo "Or add it to /etc/rc.local for persistence."
 fi

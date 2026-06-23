@@ -1,0 +1,14 @@
+# Qwen 3.5 2B Instruct — Q8_0 quantization
+name: qwen3.5-2b
+display_name: "Qwen 3.5 2B Instruct"
+hf_repo: Qwen/Qwen3.5-2B-Instruct-GGUF
+gguf_file: Qwen3.5-2B-Q8_0.gguf
+output: Qwen3.5-2B-Q8_0.llamafile
+kind: instruct
+quantization: Q8_0
+context_length: 32768
+ram_gb: 2
+features:
+  - tool_calling
+notes: >
+  Qwen 3.5 2B at Q8_0 quantization.

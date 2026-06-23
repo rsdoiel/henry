@@ -1,0 +1,14 @@
+# Qwen 3.5 4B Instruct — Q5_K_S quantization
+name: qwen3.5-4b
+display_name: "Qwen 3.5 4B Instruct"
+hf_repo: Qwen/Qwen3.5-4B-Instruct-GGUF
+gguf_file: Qwen3.5-4B-Q5_K_S.gguf
+output: Qwen3.5-4B-Q5_K_S.llamafile
+kind: instruct
+quantization: Q5_K_S
+context_length: 32768
+ram_gb: 3
+features:
+  - tool_calling
+notes: >
+  Qwen 3.5 4B at Q5_K_S quantization.

@@ -40,10 +40,16 @@ if [ ! -f "${TOOLS_DIR}/llamafile" ] || [ ! -f "${TOOLS_DIR}/zipalign" ]; then
     exit 1
 fi
 
-# Copy launcher and append GGUF
+# llamafile v0.10.3+ requires -m to be set explicitly; embed a .args file
+# so the llamafile is still self-contained (binary reads /zip/.args on startup)
+ARGS_DIR="$(mktemp -d)"
+printf -- '-m\n%s\n' "${GGUF_FILE}" > "${ARGS_DIR}/.args"
+
+# Copy launcher, append .args then GGUF (-j0 stores basename only, no dir prefix)
 cp "${TOOLS_DIR}/llamafile" "$OUTPUT_PATH"
-"${TOOLS_DIR}/zipalign" -j0 "$OUTPUT_PATH" "$GGUF_PATH"
+"${TOOLS_DIR}/zipalign" -j0 "$OUTPUT_PATH" "${ARGS_DIR}/.args" "$GGUF_PATH"
 chmod +x "$OUTPUT_PATH"
+rm -rf "$ARGS_DIR"
 
 echo ""
 echo "Built: ${OUTPUT_PATH}"
