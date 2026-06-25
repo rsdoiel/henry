@@ -1,0 +1,35 @@
+# Google Gemma 4 E4B Instruct - Built from Source
+name: gemma4-e4b
+display_name: "Google Gemma 4 E4B Instruct"
+hf_repo: google/gemma-4-E4B
+source_type: safetensors
+
+# Build from source with Gemma 4 chat template (31B-it template works for E4B —
+# same architecture, smaller efficient variant)
+convert: true
+quantization: Q4_K_M
+context_length: 131072
+chat_template: llama.cpp/models/templates/google-gemma-4-31B-it.jinja
+
+# Output files
+gguf_file: gemma-4-e4b-it-Q4_K_M.gguf
+output: Gemma4-E4B-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+  - embedding
+
+# Metadata
+kind: instruct
+ram_gb: 3
+notes: >
+  Google Gemma 4 Efficient 4B instruction-tuned model at Q4_K_M quantization (~2.5 GB file).
+  "Efficient" (E) series uses a compact architecture optimised for on-device deployment.
+  Model repository: https://huggingface.co/google/gemma-4-E4B/tree/main
+  Strong at instruction following, editorial
+  review, and technical documentation. 128K context window (131072 tokens).
+  Uses the Gemma 4 31B-it chat template — identical format across sizes.
+  Ollama equivalent: gemma4:e4b.
+  Runs comfortably on M1 Mac Mini (8 GB unified memory). On Pi 500 (CPU-only)
+  expect ~1–2 tok/s.

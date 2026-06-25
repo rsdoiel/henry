@@ -1,0 +1,37 @@
+# Microsoft Phi-4 Mini Instruct - Built from Source
+name: phi4-mini
+display_name: "Microsoft Phi-4 Mini Instruct"
+hf_repo: microsoft/Phi-4-mini-instruct
+source_type: safetensors
+
+# Build from source. Phi-4-mini ships a tokenizer_config.json chat template;
+# the Phi-3.5-mini template below is a compatible fallback — remove chat_template
+# to let llama.cpp embed the model's own template from tokenizer_config.json.
+convert: true
+quantization: Q4_K_M
+context_length: 131072
+chat_template: llama.cpp/models/templates/microsoft-Phi-3.5-mini-instruct.jinja
+
+# Output files
+gguf_file: Phi-4-mini-instruct-Q4_K_M.gguf
+output: Phi-4-mini-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+
+# Metadata
+kind: instruct
+ram_gb: 2
+notes: >
+  Microsoft Phi-4 Mini at Q4_K_M quantization (~2.2 GB file).
+  3.8B parameter model; best reasoning-per-parameter ratio in its class.
+  chat_template is set to the Phi-3.5-mini template as a starting fallback.
+  Phi-4-mini uses a compatible but updated format — if tool calling or structured
+  output behaves incorrectly, remove chat_template and let llama.cpp use the
+  embedded template from the model's tokenizer_config.json instead.
+  Model repository: https://huggingface.co/microsoft/Phi-4-mini-instruct/tree/main
+  Strong at structured reasoning, code review, and technical documentation.
+  128K context window (131072 tokens).
+  Ollama equivalent: phi4-mini.
+  Runs on M1 Mac Mini (8 GB unified memory) and Raspberry Pi 5 (8 GB RAM).

@@ -1,0 +1,22 @@
+# Qwen 2.5 Coder 7B Instruct — Q4_K_M quantization
+name: qwen2.5-coder-7b
+display_name: "Qwen 2.5 Coder 7B Instruct"
+hf_repo: Qwen/Qwen2.5-Coder-7B-Instruct-GGUF
+gguf_file: qwen2.5-coder-7b-instruct-q4_k_m.gguf
+output: Qwen2.5-Coder-7B-Q4_K_M.llamafile
+kind: instruct
+quantization: Q4_K_M
+context_length: 32768
+ram_gb: 5
+features:
+  - tool_calling
+notes: >
+  Qwen 2.5 Coder 7B at Q4_K_M quantization (~4.5 GB file).
+  Coding-focused instruct model; strong on code generation, completion,
+  and explanation across many languages including Go and TypeScript.
+  Verify the gguf_file name before building — browse
+  https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/tree/main
+  and update if the actual filename differs (Qwen 2.5 repos sometimes use
+  CamelCase instead of lowercase).
+  Runs comfortably on M1 Mac Mini (8 GB or 16 GB unified memory).
+  On Pi 500 (CPU-only) expect ~1–2 tok/s.

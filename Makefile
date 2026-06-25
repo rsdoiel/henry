@@ -1,7 +1,7 @@
 LLAMAFILE_VERSION ?= 0.10.3
 
 # Default model target
-MODEL ?= granite-3.3-8b
+MODEL ?= granite-4.1-8b
 
 CONFIG = models/$(MODEL).yaml
 OUTPUT = $(shell grep '^output:' $(CONFIG) 2>/dev/null | sed 's/output:[[:space:]]*//' | tr -d '"')

@@ -1,0 +1,21 @@
+# Qwen 3 4B Instruct 2507 — Q5_K_S quantization
+name: qwen3-4b-instruct-2507
+display_name: "Qwen 3 4B Instruct (2507)"
+hf_repo: Qwen/Qwen3-4B-Instruct-2507-GGUF
+gguf_file: Qwen3-4B-Instruct-2507-Q5_K_S.gguf
+output: Qwen3-4B-Instruct-2507-Q5_K_S.llamafile
+kind: instruct
+quantization: Q5_K_S
+context_length: 32768
+ram_gb: 3
+features:
+  - tool_calling
+notes: >
+  Qwen 3 4B Instruct, July 2025 checkpoint (2507), at Q5_K_S quantization.
+  General-purpose instruct model; smaller footprint than the 7B Coder but
+  more capable than the Qwen 3.5 4B for general reasoning tasks.
+  Verify the hf_repo and gguf_file before building — if Qwen has not published
+  an official GGUF repo for the 2507 checkpoint, try:
+    hf repos search Qwen3-4B-Instruct-2507 --model
+  and substitute the correct repo (e.g. bartowski/Qwen3-4B-Instruct-2507-GGUF).
+  Runs well on M1 Mac Mini. On Pi 500 (CPU-only) expect ~2–4 tok/s.
