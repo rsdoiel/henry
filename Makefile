@@ -9,6 +9,10 @@ OUTPUT = $(shell grep '^output:' $(CONFIG) 2>/dev/null | sed 's/output:[[:space:
 # Use local Python venv if it exists
 export PATH := .venv/bin:$(PATH)
 
+# Load HF_TOKEN and other secrets from .env if present
+-include .env
+export HF_TOKEN
+
 .PHONY: all tools deps python-deps download convert quantize package test clean help list
 
 all: tools python-deps download package
