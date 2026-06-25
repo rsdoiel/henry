@@ -81,3 +81,37 @@ test:
 clean:
 	@rm -f llamafiles/*.llamafile
 	@echo "Cleaned llamafiles/"
+
+#
+# Project Web site rules
+#
+
+BRANCH = $(shell git branch | grep '* ' | cut -d  -f 2)
+
+hash: .FORCE
+	git log --pretty=format:'%h' -n 1
+
+CITATION.cff: codemeta.json
+	cmt codemeta.json CITATION.cff
+
+about.md: codemeta.json $(PROGRAMS)
+	cmt codemeta.json about.md
+
+website: clean-website .FORCE
+	make -f website.mak
+
+status:
+	git status
+
+save:
+	@if [ "$(msg)" != "" ]; then git commit -am "$(msg)"; else git commit -am "Quick Save"; fi
+	git push origin $(BRANCH)
+
+refresh:
+	git fetch origin
+	git pull origin $(BRANCH)
+
+publish: build website .FORCE
+	./publish.bash
+
+.FORCE:

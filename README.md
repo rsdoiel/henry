@@ -8,8 +8,9 @@ A factory for building Llamafiles from open models on Hugging Face
 
 - version: 0.0.1
 - status: concept
+- released: 2026-06-25
 
-Initial scaffolding; first target is Granite 3.3 8B Q4_K_M
+Proof of concept Llamafile factory
 
 
 ### Authors
@@ -21,8 +22,18 @@ Initial scaffolding; first target is Granite 3.3 8B Q4_K_M
 ## Software Requirements
 
 - uv >= 0.10
+- python3
 - make
 - git
+- curl
+- torch
+- transformers
+- safetensors
+- sentencepiece
+- accelerate
+- huggingface_hub
+- tqdm
+- gguf
 
 ### Software Suggestions
 
@@ -34,8 +45,8 @@ Initial scaffolding; first target is Granite 3.3 8B Q4_K_M
 
 
 
-
-- [LICENSE](https://spdx.org/licenses/AGPL-3.0-or-later.html)
+- [Getting Help, Reporting bugs](https://github.com/rsdoiel/henry/issues)
+- [LICENSE](https://www.gnu.org/licenses/agpl-3.0.txt)
 - [Installation](INSTALL.md)
 - [About](about.md)
 
