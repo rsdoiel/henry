@@ -1,8 +1,13 @@
-tools/
-models-cache/
-llamafiles/
+*~
+*#
+*.tmp
+*.swp
+*.bak
 *.gguf
 *.llamafile
 .env
 .venv/
 llama.cpp/
+tools/
+models-cache/
+llamafiles/
