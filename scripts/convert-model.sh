@@ -61,6 +61,19 @@ if ! python3 -c "import torch" 2>/dev/null; then
     exit 1
 fi
 
+# Ensure llama.cpp is present before checking templates — templates under
+# llama.cpp/models/templates/ won't exist until the repo is cloned.
+CONVERT_SCRIPT="${ROOT}/llama.cpp/convert_hf_to_gguf.py"
+if [ ! -f "$CONVERT_SCRIPT" ]; then
+    echo "llama.cpp not found at ${ROOT}/llama.cpp/"
+    echo "Cloning llama.cpp..."
+    git clone https://github.com/ggml-org/llama.cpp.git "${ROOT}/llama.cpp" --depth 1
+    if [ ! -f "$CONVERT_SCRIPT" ]; then
+        echo "ERROR: Failed to clone llama.cpp or find conversion script"
+        exit 1
+    fi
+fi
+
 # Check if template exists
 if [ ! -f "${ROOT}/${TEMPLATE_FILE}" ]; then
     echo "ERROR: Template not found: ${ROOT}/${TEMPLATE_FILE}"
@@ -89,18 +102,6 @@ fi
 
 echo "Downloaded to: ${SOURCE_DIR}"
 echo ""
-
-# Check if llama.cpp conversion tools are available
-CONVERT_SCRIPT="${ROOT}/llama.cpp/convert_hf_to_gguf.py"
-if [ ! -f "$CONVERT_SCRIPT" ]; then
-    echo "llama.cpp not found at ${ROOT}/llama.cpp/"
-    echo "Cloning llama.cpp..."
-    git clone https://github.com/ggml-org/llama.cpp.git "${ROOT}/llama.cpp" --depth 1
-    if [ ! -f "$CONVERT_SCRIPT" ]; then
-        echo "ERROR: Failed to clone llama.cpp or find conversion script"
-        exit 1
-    fi
-fi
 
 # Convert to FP16 GGUF
 echo "Converting to FP16 GGUF..."
