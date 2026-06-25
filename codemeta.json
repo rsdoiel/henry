@@ -14,14 +14,9 @@
   "dateCreated": "2026-06-18",
   "dateModified": "2026-06-25",
   "datePublished": "2026-06-25",
-  "description": "A factory for building Llamafiles from open models on Hugging Face",
+  "description": "A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co",
   "name": "henry",
   "license": "https://www.gnu.org/licenses/agpl-3.0.txt",
-  "version": "0.0.1",
-  "developmentStatus": "concept",
-  "issueTracker": "https://github.com/rsdoiel/henry/issues",
-  "releaseNotes": "Proof of concept Llamafile factory",
-  "copyrightHolder": "R. S. Doiel",
   "programmingLanguage": [
     "Python",
     "Shell"
@@ -42,6 +37,12 @@
     "gguf"
   ],
   "softwareSuggestions": [
-    "huggingface_hub[cli]"
-  ]
+    "huggingface_hub[cli]",
+    "Pandoc >= 3.9"
+  ],
+  "version": "0.0.3",
+  "developmentStatus": "concept",
+  "issueTracker": "https://github.com/rsdoiel/henry/issues",
+  "releaseNotes": "Proof of concept Llamafile factory",
+  "copyrightHolder": "R. S. Doiel"
 }

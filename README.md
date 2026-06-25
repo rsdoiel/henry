@@ -2,11 +2,11 @@
 
 # henry
 
-A factory for building Llamafiles from open models on Hugging Face
+A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co
 
 ## Release Notes
 
-- version: 0.0.1
+- version: 0.0.3
 - status: concept
 - released: 2026-06-25
 
@@ -38,6 +38,7 @@ Proof of concept Llamafile factory
 ### Software Suggestions
 
 - huggingface_hub[cli]
+- Pandoc >= 3.9
 
 
 

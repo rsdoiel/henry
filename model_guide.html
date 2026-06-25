@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>henry</title>
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<a href="#main-content" class="visually-hidden">skip to main content</a>
+<nav>
+<ul>
+    <li><a href="/">All Library Apps</a></li>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="LICENSE">LICENSE</a></li>
+    <li><a href="INSTALL.html">INSTALL</a></li>
+    <li><a href="user_manual.html">User Manual</a></li>
+    <li><a href="about.html">About</a></li>
+    <!-- <li><a href="search.html">Search</a></li> -->
+    <li><a href="https://github.com/rsdoiel/henry">Code Repository</a></li>
+</ul>
+</nav>
+<section id="main-content">
+<h1
+id="henry-model-catalog-complete-guide-to-available-llms"><strong>Henry
+Model Catalog: Complete Guide to Available LLMs</strong></h1>
+<p><em>Last updated: June 25, 2026</em></p>
+<p>This document describes all models with YAML definitions in Henry,
+including their capabilities, ideal use cases, and the hardware
+trade-offs for running each. Models are organized by family and sorted
+by parameter count.</p>
+<h2 id="quick-comparison-matrix"><strong>📊 Quick Comparison
+Matrix</strong></h2>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 11%" />
+<col style="width: 9%" />
+<col style="width: 17%" />
+<col style="width: 19%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Best For</th>
+<th scope="col">Quantization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Qwen 3.5 2B</strong></td>
+<td>~1.8 GB</td>
+<td>2GB+</td>
+<td>32K</td>
+<td>Lightweight chat, edge</td>
+<td>Q8_0</td>
+</tr>
+<tr>
+<td><strong>Phi-4 Mini</strong></td>
+<td>~2.2 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td>Structured reasoning, code</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Apertus 4B</strong></td>
+<td>~2.3 GB</td>
+<td>2GB+</td>
+<td>32K</td>
+<td>Multilingual, tool calling</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Granite 4.1 3B</strong></td>
+<td>~2.4 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td>Coding, RAG, assistants</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Llama 3.2 3B</strong></td>
+<td>~2.0-3.4 GB</td>
+<td>3-4GB+</td>
+<td>128K</td>
+<td>Multilingual, general use</td>
+<td>Q4_K_M-Q8_0</td>
+</tr>
+<tr>
+<td><strong>Granite 3.3 8B</strong></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>8K</td>
+<td>Enterprise, function calling</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Gemma 4 E4B</strong></td>
+<td>~2.5 GB</td>
+<td>3GB+</td>
+<td>128K</td>
+<td>Technical docs, code review</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Qwen 3.5 4B</strong></td>
+<td>~2.5 GB</td>
+<td>3GB+</td>
+<td>32K</td>
+<td>General reasoning</td>
+<td>Q5_K_S</td>
+</tr>
+<tr>
+<td><strong>Qwen 3 4B</strong></td>
+<td>~2.7 GB</td>
+<td>3GB+</td>
+<td>32K</td>
+<td>General reasoning</td>
+<td>Q5_K_S</td>
+</tr>
+<tr>
+<td><strong>Apertus 8B</strong></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>32K</td>
+<td>Heavy multilingual</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Qwen 2.5 Coder 7B</strong></td>
+<td>~4.5 GB</td>
+<td>5GB+</td>
+<td>32K</td>
+<td>Code generation</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Llama 3 8B</strong></td>
+<td>~4.9-8.5 GB</td>
+<td>5-9GB+</td>
+<td>8K</td>
+<td>General chat, code</td>
+<td>Q4_K_M-Q8_0</td>
+</tr>
+<tr>
+<td><strong>Granite 4.1 8B</strong></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>128K</td>
+<td>Enterprise assistants</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Granite 3.3 8B (Source)</strong></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>128K</td>
+<td>Custom tool workflows</td>
+<td>Q4_K_M</td>
+</tr>
+</tbody>
+</table>
+<h2 id="meta-llama-family"><strong>🦙 Meta Llama Family</strong></h2>
+<h3
+id="llama-3.2-series-multilingual-with-extended-context"><strong>Llama
+3.2 Series</strong> — Multilingual with Extended Context</h3>
+<p>The Llama 3.2 models feature <strong>128K token context
+windows</strong> and <strong>native multilingual support</strong>
+(English, German, French, Italian, Portuguese, Hindi, Spanish, Thai).
+They are instruction-tuned and support tool calling.</p>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 13%" />
+<col style="width: 10%" />
+<col style="width: 21%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Quant</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>llama-3.2-3b-instruct</code></td>
+<td>Q4_K_M</td>
+<td>~2.0 GB</td>
+<td>3GB+</td>
+<td><strong>Entry-level multilingual</strong> — Good for basic chat,
+translation, and simple tool workflows on constrained hardware</td>
+<td>Smallest file, moderate quality</td>
+</tr>
+<tr>
+<td><code>llama-3.2-3b-instruct-q5_k_m</code></td>
+<td>Q5_K_M</td>
+<td>~2.3 GB</td>
+<td>3GB+</td>
+<td><strong>Balanced multilingual</strong> — Best price/performance for
+general use with 128K context</td>
+<td>15% larger than Q4, better accuracy</td>
+</tr>
+<tr>
+<td><code>llama-3.2-3b-instruct-q6_k_m</code></td>
+<td>Q6_K_M</td>
+<td>~2.6 GB</td>
+<td>3GB+</td>
+<td><strong>High-quality multilingual</strong> — Uses Q8_0 for critical
+weights, near-perfect output</td>
+<td>30% larger than Q4, excellent quality</td>
+</tr>
+<tr>
+<td><code>llama-3.2-3b-instruct-q8_0</code></td>
+<td>Q8_0</td>
+<td>~3.4 GB</td>
+<td>4GB+</td>
+<td><strong>Maximum quality</strong> — Best for production where
+accuracy is paramount</td>
+<td>Largest file, highest RAM</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> Multilingual applications, long-document
+processing (128K context), chatbots serving international audiences,
+tool-enabled assistants on moderate hardware.</p>
+<h3 id="llama-3-series-proven-general-purpose-models"><strong>Llama 3
+Series</strong> — Proven General-Purpose Models</h3>
+<p>The original Llama 3 models with <strong>8K token context</strong>.
+Strong at instruction following, conversation, and code generation.</p>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 13%" />
+<col style="width: 10%" />
+<col style="width: 21%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Quant</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>llama-3-8b-instruct</code></td>
+<td>Q4_K_M</td>
+<td>~4.9 GB</td>
+<td>5GB+</td>
+<td><strong>Default choice</strong> — Good balance for most users,
+strong general performance</td>
+<td>Baseline quality, smallest footprint</td>
+</tr>
+<tr>
+<td><code>llama-3-8b-instruct-q5_k_m</code></td>
+<td>Q5_K_M</td>
+<td>~5.7 GB</td>
+<td>6GB+</td>
+<td><strong>Improved quality</strong> — Better than Q4 for complex
+tasks, still reasonable size</td>
+<td>16% larger, better accuracy</td>
+</tr>
+<tr>
+<td><code>llama-3-8b-instruct-q6_k</code></td>
+<td>Q6_K</td>
+<td>~6.6 GB</td>
+<td>7GB+</td>
+<td><strong>High accuracy</strong> — Near-perfect quality for most
+applications</td>
+<td>35% larger than Q4</td>
+</tr>
+<tr>
+<td><code>llama-3-8b-instruct-q8_0</code></td>
+<td>Q8_0</td>
+<td>~8.5 GB</td>
+<td>9GB+</td>
+<td><strong>Maximum fidelity</strong> — Best for professional use where
+quality matters most</td>
+<td>73% larger than Q4, highest RAM</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> General conversational AI, code
+assistance, API servers, applications where 8K context is
+sufficient.</p>
+<p><strong>Note:</strong> Llama 3 models lack the extended context and
+multilingual capabilities of Llama 3.2 but have been more thoroughly
+tested in production.</p>
+<h2 id="ibm-granite-family"><strong>🪨 IBM Granite Family</strong></h2>
+<p>IBM’s enterprise-oriented models with strong <strong>tool calling,
+function calling, embedding, and tagged content</strong> support. All
+Granite models support structured reasoning with
+<code>&lt;think&gt;</code> and <code>&lt;response&gt;</code> tags.</p>
+<h3 id="granite-4.1-series-next-generation"><strong>Granite 4.1
+Series</strong> — Next-Generation</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>granite-4.1-3b-source</code></td>
+<td>~2.4 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td><strong>Lightweight enterprise</strong> — Coding, RAG, multilingual
+workflows on limited hardware</td>
+<td>Small size, full 128K context</td>
+</tr>
+<tr>
+<td><code>granite-4.1-8b-source</code></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>128K</td>
+<td><strong>Full enterprise</strong> — Complex tool workflows, large
+documents, production assistants</td>
+<td>Higher RAM, more capable</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> Enterprise applications, RAG systems, AI
+assistants with complex tool integration, coding workflows.</p>
+<h3 id="granite-3.3-series-stable-release"><strong>Granite 3.3
+Series</strong> — Stable Release</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>granite-3.3-8b</code></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>8K</td>
+<td><strong>Quick deployment</strong> — Pre-built GGUF, fast setup,
+function calling ready</td>
+<td>Limited context (8K)</td>
+</tr>
+<tr>
+<td><code>granite-3.3-8b-source</code></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>128K</td>
+<td><strong>Custom tool workflows</strong> — Built from source with
+extended context and full feature set</td>
+<td>Requires conversion from source</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> Business applications requiring function
+calling, structured outputs, and compliance-ready workflows.</p>
+<p><strong>Granite features across all models:</strong>
+<code>tool_calling</code>, <code>function_calling</code>,
+<code>embedding</code>, <code>tagged</code></p>
+<h2 id="swiss-ai-apertus-family"><strong>⛰️ Swiss-AI Apertus
+Family</strong></h2>
+<p>Open models from Swiss-AI with <strong>EU AI Act compliance</strong>
+and <strong>1811 language support</strong>.</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apertus-4b</code></td>
+<td>~2.3 GB</td>
+<td>2GB+</td>
+<td>32K</td>
+<td><strong>Lightweight multilingual</strong> — 1811 languages, tool
+calling, embedding on minimal hardware</td>
+<td>Smaller, distilled from 8B</td>
+</tr>
+<tr>
+<td><code>apertus-8b</code></td>
+<td>~4.9 GB</td>
+<td>6GB+</td>
+<td>32K</td>
+<td><strong>Full multilingual</strong> — Source model for 4B, more
+capable for complex multilingual tasks</td>
+<td>2x the RAM of 4B</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features:</strong> <code>tool_calling</code>,
+<code>embedding</code>, <code>tagged</code></p>
+<p><strong>Best for:</strong> Multilingual applications, European
+deployments requiring compliance, tool-enabled chatbots serving diverse
+language communities.</p>
+<p><strong>Note:</strong> Both use custom chat templates supporting
+<code>&lt;tool_call&gt;</code> tags.</p>
+<h2 id="google-gemma-family"><strong>🌸 Google Gemma
+Family</strong></h2>
+<p>Google’s efficient models optimized for on-device deployment.</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gemma4-e4b</code></td>
+<td>~2.5 GB</td>
+<td>3GB+</td>
+<td>128K</td>
+<td><strong>Technical documentation</strong> — Code review, editorial
+tasks, technical writing with massive context</td>
+<td>Efficient architecture, 128K context</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features:</strong> <code>tool_calling</code>,
+<code>embedding</code></p>
+<p><strong>Best for:</strong> Technical content generation, code review,
+documentation assistance, deployments on resource-constrained devices
+(runs on M1 Mac Mini with 8GB, Raspberry Pi 500 at ~1-2 tok/s).</p>
+<p><strong>Note:</strong> Uses the “Efficient” (E) series architecture,
+which is compact but highly capable.</p>
+<h2 id="microsoft-phi-family"><strong>🔍 Microsoft Phi
+Family</strong></h2>
+<p>Microsoft’s reasoning-optimized models with exceptional
+<strong>reasoning-per-parameter</strong> ratios.</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>phi4-mini</code></td>
+<td>~2.2 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td><strong>Structured reasoning</strong> — Code review, technical
+documentation, complex problem-solving</td>
+<td>3.8B parameters, best reasoning/parameter ratio</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features:</strong> <code>tool_calling</code></p>
+<p><strong>Best for:</strong> Applications requiring strong reasoning
+capabilities in a compact package, technical decision-making, code
+analysis.</p>
+<p><strong>Note:</strong> Can use either the embedded chat template from
+<code>tokenizer_config.json</code> or a Phi-3.5-mini fallback
+template.</p>
+<h2 id="alibaba-qwen-family"><strong>🐉 Alibaba Qwen
+Family</strong></h2>
+<p>Alibaba’s Qwen models, with specialized coding variants.</p>
+<h3 id="qwen-3.5-series"><strong>Qwen 3.5 Series</strong></h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 9%" />
+<col style="width: 16%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Quant</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>qwen3.5-2b</code></td>
+<td>Q8_0</td>
+<td>~1.8 GB</td>
+<td>2GB+</td>
+<td>32K</td>
+<td><strong>Ultra-lightweight</strong> — Minimal hardware, basic tool
+calling</td>
+<td>Smallest Qwen, limited capability</td>
+</tr>
+<tr>
+<td><code>qwen3.5-4b</code></td>
+<td>Q5_K_S</td>
+<td>~2.5 GB</td>
+<td>3GB+</td>
+<td>32K</td>
+<td><strong>General purpose</strong> — Good balance for most Qwen use
+cases</td>
+<td>Mid-range size and capability</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> Budget deployments, edge devices, simple
+chat applications.</p>
+<h3 id="qwen-3-series"><strong>Qwen 3 Series</strong></h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 9%" />
+<col style="width: 16%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Quant</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>qwen3-4b-instruct-2507</code></td>
+<td>Q5_K_S</td>
+<td>~2.7 GB</td>
+<td>3GB+</td>
+<td>32K</td>
+<td><strong>Latest checkpoint</strong> — July 2025 model with improved
+capabilities over 3.5 series</td>
+<td>Newer model, better general reasoning</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> Users wanting the latest Qwen improvements
+for general reasoning tasks.</p>
+<h3 id="qwen-2.5-coder-series-coding-specialists"><strong>Qwen 2.5 Coder
+Series</strong> — Coding Specialists</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 9%" />
+<col style="width: 16%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Quant</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>qwen2.5-coder-7b</code></td>
+<td>Q4_K_M</td>
+<td>~4.5 GB</td>
+<td>5GB+</td>
+<td>32K</td>
+<td><strong>Code generation</strong> — Strong on Go, TypeScript, and
+many other languages</td>
+<td>Specialized for coding, less general knowledge</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features:</strong> <code>tool_calling</code></p>
+<p><strong>Best for:</strong> Code completion, code explanation, code
+generation across multiple programming languages, IDE integrations.</p>
+<p><strong>Note:</strong> File naming may vary in the GGUF repo (check
+Hugging Face for exact casing).</p>
+<h2 id="resource-requirement-tiers"><strong>🎯 Resource Requirement
+Tiers</strong></h2>
+<h3 id="tier-1-ultra-lightweight-2gb-ram"><strong>Tier 1:
+Ultra-Lightweight (2GB RAM)</strong></h3>
+<p><em>Can run on: Raspberry Pi 5 (8GB), M1 Mac Mini (8GB), budget
+laptops</em></p>
+<table>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen 3.5 2B</td>
+<td>Basic chat, simple tool calling</td>
+</tr>
+<tr>
+<td>Phi-4 Mini</td>
+<td>Structured reasoning, technical tasks</td>
+</tr>
+<tr>
+<td>Apertus 4B</td>
+<td>Multilingual chat, 1811 languages</td>
+</tr>
+<tr>
+<td>Granite 4.1 3B (Source)</td>
+<td>Coding, RAG, enterprise workflows</td>
+</tr>
+<tr>
+<td>Llama 3.2 3B (Q4_K_M)</td>
+<td>Multilingual, 128K context</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best choice:</strong> Phi-4 Mini for reasoning, Llama 3.2 3B
+for multilingual, Apertus 4B for language coverage.</p>
+<h3 id="tier-2-lightweight-4gb-ram"><strong>Tier 2: Lightweight (4GB
+RAM)</strong></h3>
+<p><em>Can run on: Most modern laptops, M1 MacBook Air, mid-range
+desktops</em></p>
+<table>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Llama 3.2 3B (Q5_K_M-Q8_0)</td>
+<td>High-quality multilingual</td>
+</tr>
+<tr>
+<td>Qwen 3.5 4B</td>
+<td>General reasoning</td>
+</tr>
+<tr>
+<td>Qwen 3 4B Instruct (2507)</td>
+<td>Latest Qwen improvements</td>
+</tr>
+<tr>
+<td>Granite 4.1 3B (Source)</td>
+<td>Enterprise workflows</td>
+</tr>
+<tr>
+<td>Gemma 4 E4B</td>
+<td>Technical documentation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best choice:</strong> Llama 3.2 3B Q5_K_M for balanced
+multilingual performance.</p>
+<h3 id="tier-3-standard-6-8gb-ram"><strong>Tier 3: Standard (6-8GB
+RAM)</strong></h3>
+<p><em>Can run on: M1 MacBook Pro, gaming laptops, workstations</em></p>
+<table>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Llama 3 8B (Q4_K_M-Q6_K)</td>
+<td>General purpose, code, chat</td>
+</tr>
+<tr>
+<td>Granite 3.3 8B / 4.1 8B</td>
+<td>Enterprise, function calling</td>
+</tr>
+<tr>
+<td>Apertus 8B</td>
+<td>Heavy multilingual</td>
+</tr>
+<tr>
+<td>Qwen 2.5 Coder 7B</td>
+<td>Code generation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best choice:</strong> Llama 3 8B Q5_K_M for best balance,
+Granite 4.1 8B for enterprise tool workflows.</p>
+<h3 id="tier-4-high-end-8gb-ram"><strong>Tier 4: High-End (8GB+
+RAM)</strong></h3>
+<p><em>Can run on: M2 MacBook Pro, workstations, servers</em></p>
+<table>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Llama 3 8B Q8_0</td>
+<td>Maximum quality general use</td>
+</tr>
+<tr>
+<td>All other models at higher quantizations</td>
+<td>Best quality variants</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best choice:</strong> Llama 3 8B Q8_0 for maximum quality, or
+any model at its highest quantization.</p>
+<h2 id="use-case-recommendations"><strong>💡 Use Case
+Recommendations</strong></h2>
+<h3 id="coding-development"><strong>🔧 Coding &amp;
+Development</strong></h3>
+<table>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 31%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Priority</th>
+<th scope="col">Model</th>
+<th scope="col">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Qwen 2.5 Coder 7B</strong></td>
+<td>Specialized for code, strong on Go/TypeScript</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Granite 4.1 8B (Source)</strong></td>
+<td>128K context, tool calling for IDE integration</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Llama 3 8B Q5_K_M</strong></td>
+<td>Strong general code assistance</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Phi-4 Mini</strong></td>
+<td>Excellent reasoning for code review</td>
+</tr>
+</tbody>
+</table>
+<h3 id="multilingual-applications"><strong>🌍 Multilingual
+Applications</strong></h3>
+<table>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 31%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Priority</th>
+<th scope="col">Model</th>
+<th scope="col">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Apertus 8B</strong></td>
+<td>1811 languages, EU compliant</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Llama 3.2 3B Q5_K_M</strong></td>
+<td>9 languages, 128K context</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Apertus 4B</strong></td>
+<td>1811 languages, minimal hardware</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Granite 4.1 3B/8B</strong></td>
+<td>Multilingual support, enterprise features</td>
+</tr>
+</tbody>
+</table>
+<h3 id="long-document-processing-128k-context"><strong>📄 Long Document
+Processing (128K Context)</strong></h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Priority</th>
+<th scope="col">Model</th>
+<th scope="col">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Granite 4.1 8B (Source)</strong></td>
+<td>128K context, enterprise features</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Llama 3.2 3B Q5_K_M</strong></td>
+<td>128K context, multilingual, balanced</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Gemma 4 E4B</strong></td>
+<td>128K context, efficient architecture</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Phi-4 Mini</strong></td>
+<td>128K context, strong reasoning</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Granite 4.1 3B (Source)</strong></td>
+<td>128K context, lightweight</td>
+</tr>
+</tbody>
+</table>
+<h3 id="general-chat-assistants"><strong>🎯 General Chat &amp;
+Assistants</strong></h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Priority</th>
+<th scope="col">Model</th>
+<th scope="col">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Llama 3 8B Q5_K_M</strong></td>
+<td>Proven, high quality, tool calling</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Llama 3.2 3B Q5_K_M</strong></td>
+<td>128K context, multilingual</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Granite 4.1 8B (Source)</strong></td>
+<td>Enterprise features, 128K context</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Phi-4 Mini</strong></td>
+<td>Strong reasoning in compact package</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tool-calling-function-calling"><strong>🔌 Tool Calling &amp;
+Function Calling</strong></h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Priority</th>
+<th scope="col">Model</th>
+<th scope="col">Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Granite 4.1 8B (Source)</strong></td>
+<td><code>tool_calling</code>, <code>function_calling</code>,
+<code>embedding</code>, <code>tagged</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Granite 3.3 8B (Source)</strong></td>
+<td>Same as above, 128K context</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Apertus 8B</strong></td>
+<td><code>tool_calling</code>, <code>embedding</code>,
+<code>tagged</code>, 1811 languages</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Llama 3.2 3B Q6_K_M</strong></td>
+<td><code>tool_calling</code>, 128K context, multilingual</td>
+</tr>
+</tbody>
+</table>
+<h3 id="budget-deployments"><strong>💰 Budget Deployments</strong></h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Priority</th>
+<th scope="col">Model</th>
+<th scope="col">Hardware</th>
+<th scope="col">Capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Qwen 3.5 2B</strong></td>
+<td>2GB RAM</td>
+<td>Basic tool calling, 32K context</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Phi-4 Mini</strong></td>
+<td>2GB RAM</td>
+<td>Strong reasoning, 128K context</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Apertus 4B</strong></td>
+<td>2GB RAM</td>
+<td>1811 languages, tool calling</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Llama 3.2 3B Q4_K_M</strong></td>
+<td>3GB RAM</td>
+<td>Multilingual, 128K context</td>
+</tr>
+</tbody>
+</table>
+<h2 id="trade-off-summary"><strong>⚖️ Trade-off Summary</strong></h2>
+<h3 id="quantization-trade-offs"><strong>Quantization
+Trade-offs</strong></h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 19%" />
+<col style="width: 16%" />
+<col style="width: 8%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Quantization</th>
+<th scope="col">File Size</th>
+<th scope="col">Quality</th>
+<th scope="col">RAM</th>
+<th scope="col">Speed</th>
+<th scope="col">Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q4_K_M</td>
+<td>Smallest (75% of Q8)</td>
+<td>Good</td>
+<td>Lower</td>
+<td>Fastest</td>
+<td>Budget deployments, testing</td>
+</tr>
+<tr>
+<td>Q5_K_M</td>
+<td>Moderate (+15-20%)</td>
+<td>High</td>
+<td>+1GB</td>
+<td>Slightly slower</td>
+<td>Best balance for most users</td>
+</tr>
+<tr>
+<td>Q5_K_S</td>
+<td>Moderate (+15-20%)</td>
+<td>Very High</td>
+<td>+1GB</td>
+<td>Slightly slower</td>
+<td>High-quality variants</td>
+</tr>
+<tr>
+<td>Q6_K</td>
+<td>Larger (+30-35%)</td>
+<td>Very High</td>
+<td>+1-2GB</td>
+<td>Slower</td>
+<td>Near-perfect quality</td>
+</tr>
+<tr>
+<td>Q6_K_M</td>
+<td>Larger (+30-35%)</td>
+<td>Very High</td>
+<td>+1-2GB</td>
+<td>Slower</td>
+<td>Uses Q8_0 for critical weights</td>
+</tr>
+<tr>
+<td>Q8_0</td>
+<td>Largest (baseline)</td>
+<td>Maximum</td>
+<td>+2-3GB</td>
+<td>Slowest</td>
+<td>Production, maximum accuracy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-size-trade-offs"><strong>Model Size
+Trade-offs</strong></h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Size</th>
+<th scope="col">Pros</th>
+<th scope="col">Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2-3B</strong></td>
+<td>Low RAM, fast, 128K context available</td>
+<td>Less capable, limited complexity</td>
+</tr>
+<tr>
+<td><strong>4-5B</strong></td>
+<td>Good balance, 32-128K context</td>
+<td>Moderate RAM, reasonable capability</td>
+</tr>
+<tr>
+<td><strong>7-8B</strong></td>
+<td>High capability, production-ready</td>
+<td>Higher RAM (6-9GB), larger files</td>
+</tr>
+</tbody>
+</table>
+<h3 id="context-length-trade-offs"><strong>Context Length
+Trade-offs</strong></h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Context</th>
+<th scope="col">Pros</th>
+<th scope="col">Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>8K</strong></td>
+<td>Lower RAM, faster</td>
+<td>Can’t process long documents</td>
+</tr>
+<tr>
+<td><strong>32K</strong></td>
+<td>Good for most documents</td>
+<td>Moderate RAM increase</td>
+</tr>
+<tr>
+<td><strong>128K</strong></td>
+<td>Full books, long conversations</td>
+<td>Higher RAM, slower</td>
+</tr>
+</tbody>
+</table>
+<h2 id="top-picks-by-scenario"><strong>🏆 Top Picks by
+Scenario</strong></h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 25%" />
+<col style="width: 22%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Scenario</th>
+<th scope="col">Best Model</th>
+<th scope="col">Runner-Up</th>
+<th scope="col">Budget Option</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Best overall</strong></td>
+<td>Llama 3 8B Q5_K_M</td>
+<td>Llama 3.2 3B Q5_K_M</td>
+<td>Llama 3.2 3B Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Best for coding</strong></td>
+<td>Qwen 2.5 Coder 7B</td>
+<td>Granite 4.1 8B (Source)</td>
+<td>Llama 3 8B Q5_K_M</td>
+</tr>
+<tr>
+<td><strong>Best multilingual</strong></td>
+<td>Apertus 8B</td>
+<td>Llama 3.2 3B Q5_K_M</td>
+<td>Apertus 4B</td>
+</tr>
+<tr>
+<td><strong>Best for long docs</strong></td>
+<td>Granite 4.1 8B (Source)</td>
+<td>Llama 3.2 3B Q5_K_M</td>
+<td>Gemma 4 E4B</td>
+</tr>
+<tr>
+<td><strong>Best reasoning</strong></td>
+<td>Phi-4 Mini</td>
+<td>Llama 3 8B Q6_K</td>
+<td>Llama 3.2 3B Q6_K_M</td>
+</tr>
+<tr>
+<td><strong>Best enterprise</strong></td>
+<td>Granite 4.1 8B (Source)</td>
+<td>Granite 3.3 8B (Source)</td>
+<td>Apertus 8B</td>
+</tr>
+<tr>
+<td><strong>Best for edge</strong></td>
+<td>Phi-4 Mini</td>
+<td>Qwen 3.5 2B</td>
+<td>Llama 3.2 3B Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Lowest RAM</strong></td>
+<td>Qwen 3.5 2B (2GB)</td>
+<td>Phi-4 Mini (2GB)</td>
+<td>Apertus 4B (2GB)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="model-type-key"><strong>📦 Model Type Key</strong></h2>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Field</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>convert: true</code></strong></td>
+<td>Model must be converted from source (safetensors) to GGUF</td>
+</tr>
+<tr>
+<td><strong><code>source_type: safetensors</code></strong></td>
+<td>Model is in PyTorch safetensors format, not pre-converted GGUF</td>
+</tr>
+<tr>
+<td><strong><code>chat_template</code></strong></td>
+<td>Custom template used for conversation formatting</td>
+</tr>
+<tr>
+<td><strong><code>features</code></strong></td>
+<td>Capabilities baked into the GGUF: <code>tool_calling</code>,
+<code>function_calling</code>, <code>embedding</code>,
+<code>tagged</code></td>
+</tr>
+<tr>
+<td><strong><code>kind: instruct</code></strong></td>
+<td>Instruction-tuned model (follows prompts better)</td>
+</tr>
+<tr>
+<td><strong><code>ram_gb</code></strong></td>
+<td>Recommended minimum RAM for comfortable operation</td>
+</tr>
+<tr>
+<td><strong><code>context_length</code></strong></td>
+<td>Maximum token context window</td>
+</tr>
+</tbody>
+</table>
+</section>
+</body>
+</html>

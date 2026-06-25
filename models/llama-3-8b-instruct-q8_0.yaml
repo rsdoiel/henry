@@ -1,0 +1,21 @@
+# Meta Llama 3 8B Instruct — Q8_0 quantization
+name: llama-3-8b-instruct-q8_0
+display_name: "Meta Llama 3 8B Instruct Q8_0"
+hf_repo: bartowski/Meta-Llama-3-8B-Instruct-GGUF
+gguf_file: Meta-Llama-3-8B-Instruct-Q8_0.gguf
+output: Meta-Llama-3-8B-Instruct-Q8_0.llamafile
+kind: instruct
+quantization: Q8_0
+context_length: 8192
+ram_gb: 9
+features:
+  - tool_calling
+notes: >
+  Meta Llama 3 8B instruction-tuned model at Q8_0 quantization (~8.5 GB file).
+  Extremely high quality, maximum available quantization.
+  8K context window (8192 tokens).
+  Model repository: https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
+  GGUF repository: https://huggingface.co/bartowski/Meta-Llama-3-8B-Instruct-GGUF
+  Ollama equivalent: llama3:8b-instruct
+  Best quality but largest file size.
+  Requires 12GB+ RAM for comfortable operation.

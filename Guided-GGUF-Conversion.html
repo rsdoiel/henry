@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>henry</title>
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<a href="#main-content" class="visually-hidden">skip to main content</a>
+<nav>
+<ul>
+    <li><a href="/">All Library Apps</a></li>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="LICENSE">LICENSE</a></li>
+    <li><a href="INSTALL.html">INSTALL</a></li>
+    <li><a href="user_manual.html">User Manual</a></li>
+    <li><a href="about.html">About</a></li>
+    <!-- <li><a href="search.html">Search</a></li> -->
+    <li><a href="https://github.com/rsdoiel/henry">Code Repository</a></li>
+</ul>
+</nav>
+<section id="main-content">
+<h1 id="henry-gguf-conversion-guide">Henry GGUF Conversion Guide</h1>
+<p><strong>Building Llamafiles from HuggingFace Models with Custom
+Features</strong></p>
+<p><em>Version: 1.2 - Updated June 2026</em></p>
+<p>This guide explains how Henry converts HuggingFace models to GGUF
+format and packages them into Llamafiles, with full support for custom
+chat templates, tool calling, embedding, and tagged content.</p>
+<h2 id="overview">Overview</h2>
+<p>Henry is a <strong>Factory for building Llamafiles</strong> from open
+models on Hugging Face. It supports <strong>three
+workflows</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 14%" />
+<col style="width: 27%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Workflow</th>
+<th scope="col">Description</th>
+<th scope="col">Models</th>
+<th scope="col">Customization</th>
+<th scope="col">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pre-built GGUF</strong></td>
+<td>Downloads pre-converted GGUF from HuggingFace</td>
+<td>Granite 3.3 8B</td>
+<td>Limited to pre-built features</td>
+<td>✅ Default</td>
+</tr>
+<tr>
+<td><strong>Source Conversion</strong></td>
+<td>Converts model sources to GGUF with custom templates</td>
+<td>Apertus 4B, Granite 3.3/4.1</td>
+<td>Full control over features</td>
+<td>✅ Available</td>
+</tr>
+</tbody>
+</table>
+<p>All workflows produce quantized GGUF files that are then packaged
+into <strong>standalone Llamafile executables</strong>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="pre-built-gguf-fastest">Pre-built GGUF (Fastest)</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original Granite 3.3 8B with baked-in tool support</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-3.3-8b</span></code></pre></div>
+<h3 id="source-conversion-custom-features">Source Conversion (Custom
+Features)</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Granite 3.3 8B - Full control, 128K context</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-3.3-8b-source</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Granite 4.1 3B - Enhanced tool calling, 128K+ context</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-4.1-3b-source</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Apertus 4B - Custom template, multilingual</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=apertus-4b</span></code></pre></div>
+<h2 id="supported-models">Supported Models</h2>
+<h3 id="ibm-granite-models">IBM Granite Models</h3>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 25%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 17%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Config File</th>
+<th scope="col">Type</th>
+<th scope="col">Size</th>
+<th scope="col">Context</th>
+<th scope="col">Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Granite 3.3 8B</td>
+<td><code>granite-3.3-8b.yaml</code></td>
+<td>Pre-built GGUF</td>
+<td>8B</td>
+<td>8K</td>
+<td>Tool calling, function calling</td>
+</tr>
+<tr>
+<td><strong>Granite 3.3 8B</strong></td>
+<td><strong><code>granite-3.3-8b-source.yaml</code></strong></td>
+<td><strong>Source conversion</strong></td>
+<td><strong>8B</strong></td>
+<td><strong>128K</strong></td>
+<td><strong>Tool calling, embedding, tagged, function
+calling</strong></td>
+</tr>
+<tr>
+<td><strong>Granite 4.1 3B</strong></td>
+<td><strong><code>granite-4.1-3b-source.yaml</code></strong></td>
+<td><strong>Source conversion</strong></td>
+<td><strong>3B</strong></td>
+<td><strong>128K+</strong></td>
+<td><strong>Tool calling, embedding, tagged, function
+calling</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> There is currently no official IBM Granite 4B
+<em>text</em> model. The closest is Granite 4.1 3B (3 billion
+parameters) or Granite Vision 4.1 4B (vision-language model).</p>
+</blockquote>
+<h3 id="swiss-ai-apertus-models">Swiss-AI Apertus Models</h3>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 25%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 17%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Config File</th>
+<th scope="col">Type</th>
+<th scope="col">Size</th>
+<th scope="col">Context</th>
+<th scope="col">Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Apertus 4B</strong></td>
+<td><strong><code>apertus-4b.yaml</code></strong></td>
+<td><strong>Source conversion</strong></td>
+<td><strong>4B</strong></td>
+<td><strong>32K</strong></td>
+<td><strong>Tool calling, embedding, tagged</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="workflow-1-pre-built-gguf-granite-3.3-8b">Workflow 1: Pre-built
+GGUF (Granite 3.3 8B)</h2>
+<p>This is the <strong>fastest workflow</strong> for models that already
+have GGUF versions available on HuggingFace.</p>
+<h3 id="configuration-file">Configuration File</h3>
+<p><code>models/granite-3.3-8b.yaml</code></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> granite-3.3-8b</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">display_name</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;IBM Granite 3.3 8B Instruct&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hf_repo</span><span class="kw">:</span><span class="at"> ibm-granite/granite-3.3-8b-instruct-GGUF</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gguf_file</span><span class="kw">:</span><span class="at"> granite-3.3-8b-instruct-Q4_K_M.gguf</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> granite-3.3-8b-Q4_K_M.llamafile</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> instruct</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">quantization</span><span class="kw">:</span><span class="at"> Q4_K_M</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">context_length</span><span class="kw">:</span><span class="at"> </span><span class="dv">8192</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tool_calling</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> function_calling</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">notes</span><span class="kw">: </span><span class="ch">&gt;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  Granite 3.3 8B with Q4_K_M quantization (~4.9 GB file).</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  Tool-call tags are baked into the GGUF chat template.</span></code></pre></div>
+<p><strong>Key Fields:</strong></p>
+<ul>
+<li><code>hf_repo</code>: Points to pre-built GGUF repository</li>
+<li><code>gguf_file</code>: Pre-built GGUF to download</li>
+<li><code>convert</code>: Missing/false → uses pre-built workflow</li>
+</ul>
+<h3 id="process-flow">Process Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│  1. DOWNLOAD (scripts/download-model.sh)                    │
+│     ├── Parses: hf_repo, gguf_file                          │
+│     ├── Downloads: ibm-granite/granite-3.3-8b-instruct-GGUF │
+│     │   └── granite-3.3-8b-instruct-Q4_K_M.gguf             │
+│     └── Saves to: models-cache/granite-3.3-8b/              │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌───────────────────────────────────────────────────────────────┐
+│  2. PACKAGE (scripts/package.sh)                              │
+│     ├── Copies: tools/llamafile → llamafiles/output.llamafile │
+│     ├── Appends: GGUF using zipalign                          │
+│     └── Result: Standalone executable Llamafile               │
+└───────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="commands">Commands</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> deps          <span class="co"># Check dependencies</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> tools         <span class="co"># Download llamafile + zipalign</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> download      <span class="co"># Download pre-built GGUF</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> package       <span class="co"># Package into Llamafile</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all           <span class="co"># All steps combined</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> clean         <span class="co"># Clean up</span></span></code></pre></div>
+<p>Example:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-3.3-8b</span></code></pre></div>
+<h2 id="workflow-2-source-conversion-granite-3.3-8b">Workflow 2: Source
+Conversion (Granite 3.3 8B)</h2>
+<p>Converts <strong>Granite 3.3 8B from source</strong> with custom chat
+template for full control over features.</p>
+<h3 id="configuration-file-1">Configuration File</h3>
+<p><code>models/granite-3.3-8b-source.yaml</code></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> granite-3.3-8b-source</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">display_name</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;IBM Granite 3.3 8B Instruct (Source)&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hf_repo</span><span class="kw">:</span><span class="at"> ibm-granite/granite-3.3-8b-instruct</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source_type</span><span class="kw">:</span><span class="at"> safetensors</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">convert</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">              # ← Enables source conversion</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">quantization</span><span class="kw">:</span><span class="at"> Q4_K_M</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">context_length</span><span class="kw">:</span><span class="at"> </span><span class="dv">122880</span><span class="co">    # Full 128K context</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">chat_template</span><span class="kw">:</span><span class="at"> templates/granite-toolcall.jinja</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">gguf_file</span><span class="kw">:</span><span class="at"> granite-3.3-8b-instruct-Q4_K_M.gguf</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> granite-3.3-8b-source-Q4_K_M.llamafile</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tool_calling</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> embedding</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tagged</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> function_calling</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> instruct</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ram_gb</span><span class="kw">:</span><span class="at"> </span><span class="dv">6</span></span></code></pre></div>
+<h3 id="custom-template">Custom Template</h3>
+<p><code>templates/granite-toolcall.jinja</code></p>
+<ul>
+<li><strong>Tool Calling</strong>: <code>&lt;tool_call&gt;</code> tags
+with JSON metadata</li>
+<li><strong>Tagged Content</strong>: <code>&lt;think&gt;</code> and
+<code>&lt;response&gt;</code> tags (Granite native)</li>
+<li><strong>Message Boundaries</strong>: <code>&lt;|im_start|&gt;</code>
+and <code>&lt;|im_end|&gt;</code> tokens</li>
+<li><strong>Structured Output</strong>: Machine-readable tool calls</li>
+</ul>
+<h3 id="process-flow-1">Process Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│  1. DOWNLOAD (detects convert:true)                         │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2. CONVERT (scripts/convert-model.sh)                      │
+│     ├── Downloads: ibm-granite/granite-3.3-8b-instruct      │
+│     ├── Auto-clones: llama.cpp if needed                    │
+│     ├── Converts: Safetensors → FP16 GGUF                   │
+│     │   └── Uses: templates/granite-toolcall.jinja          │
+│     └── Output: models-cache/.../granite-3.3-8b.fp16.gguf   │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3. QUANTIZE (scripts/quantize-model.sh)                    │
+│     ├── Auto-builds: llama-quantize if needed               │
+│     ├── Quantizes: FP16 → Q4_K_M                            │
+│     └── Output: models-cache/.../granite-3.3-8b-Q4_K_M.gguf │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  4. PACKAGE (scripts/package.sh)                            │
+│     └── Packages GGUF into Llamafile                        │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="commands-1">Commands</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-3.3-8b-source    <span class="co"># Full build</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> convert MODEL=granite-3.3-8b-source  <span class="co"># Source → FP16</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> quantize MODEL=granite-3.3-8b-source <span class="co"># FP16 → Q4_K_M</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> package MODEL=granite-3.3-8b-source  <span class="co"># GGUF → Llamafile</span></span></code></pre></div>
+<h2 id="workflow-3-source-conversion-granite-4.1-3b">Workflow 3: Source
+Conversion (Granite 4.1 3B)</h2>
+<p>Converts <strong>Granite 4.1 3B from source</strong> with enhanced
+tool calling and extended context.</p>
+<h3 id="configuration-file-2">Configuration File</h3>
+<p><code>models/granite-4.1-3b-source.yaml</code></p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> granite-4.1-3b-source</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">display_name</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;IBM Granite 4.1 3B Instruct (Source)&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hf_repo</span><span class="kw">:</span><span class="at"> ibm-granite/granite-4.1-3b</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source_type</span><span class="kw">:</span><span class="at"> safetensors</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">convert</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">quantization</span><span class="kw">:</span><span class="at"> Q4_K_M</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">context_length</span><span class="kw">:</span><span class="at"> </span><span class="dv">131072</span><span class="co">    # Full 128K+ context</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">chat_template</span><span class="kw">:</span><span class="at"> templates/granite-toolcall.jinja</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">gguf_file</span><span class="kw">:</span><span class="at"> granite-4.1-3b-instruct-Q4_K_M.gguf</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> granite-4.1-3b-source-Q4_K_M.llamafile</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tool_calling</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> embedding</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tagged</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> function_calling</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> instruct</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ram_gb</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span></code></pre></div>
+<h3 id="key-features">Key Features</h3>
+<ul>
+<li><strong>Granite 4.1 family</strong>: Improved SFT+RL pipelines</li>
+<li><strong>Enhanced tool calling</strong>: Better function
+integration</li>
+<li><strong>128K+ context</strong>: 131072 token context length</li>
+<li><strong>Smaller footprint</strong>: 3B parameters (~2 GB RAM)</li>
+</ul>
+<h3 id="commands-2">Commands</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-4.1-3b-source</span></code></pre></div>
+<h2 id="workflow-4-source-conversion-apertus-4b">Workflow 4: Source
+Conversion (Apertus 4B)</h2>
+<p>Converts <strong>Swiss-AI Apertus 4B from source</strong> with custom
+template for tool calling.</p>
+<h3 id="configuration-file-3">Configuration File</h3>
+<p><code>models/apertus-4b.yaml</code></p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> apertus-4b</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">display_name</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Swiss-AI Apertus 4B Instruct&quot;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hf_repo</span><span class="kw">:</span><span class="at"> swiss-ai/Apertus-v1.1-4B-Instruct</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source_type</span><span class="kw">:</span><span class="at"> safetensors</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">convert</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">quantization</span><span class="kw">:</span><span class="at"> Q4_K_M</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">context_length</span><span class="kw">:</span><span class="at"> </span><span class="dv">32768</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">chat_template</span><span class="kw">:</span><span class="at"> templates/apertus-4b-toolcall.jinja</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">gguf_file</span><span class="kw">:</span><span class="at"> apertus-4b-instruct-Q4_K_M.gguf</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> apertus-4b-Q4_K_M.llamafile</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tool_calling</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> embedding</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> tagged</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> instruct</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ram_gb</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span></code></pre></div>
+<h3 id="custom-template-1">Custom Template</h3>
+<p><code>templates/apertus-4b-toolcall.jinja</code></p>
+<ul>
+<li><strong>Tool Calling</strong>: <code>&lt;tool_call&gt;</code> tags
+with JSON</li>
+<li><strong>Tagged Content</strong>: Custom format</li>
+<li><strong>Message Boundaries</strong>: <code>&lt;|im_start|&gt;</code>
+and <code>&lt;|im_end|&gt;</code></li>
+<li><strong>Multilingual</strong>: Supports 1811 languages</li>
+</ul>
+<h3 id="commands-3">Commands</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=apertus-4b</span></code></pre></div>
+<h2 id="model-comparison">Model Comparison</h2>
+<h3 id="granite-family">Granite Family</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 21%" />
+<col style="width: 19%" />
+<col style="width: 10%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">Workflow</th>
+<th scope="col">Context</th>
+<th scope="col">RAM</th>
+<th scope="col">Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>granite-3.3-8b</code></td>
+<td>8B</td>
+<td>Pre-built</td>
+<td>8K</td>
+<td>~6 GB</td>
+<td>Tool calling, function calling</td>
+</tr>
+<tr>
+<td><code>granite-3.3-8b-source</code></td>
+<td>8B</td>
+<td>Source</td>
+<td>128K</td>
+<td>~6 GB</td>
+<td><strong>All features</strong></td>
+</tr>
+<tr>
+<td><code>granite-4.1-3b-source</code></td>
+<td>3B</td>
+<td>Source</td>
+<td>128K+</td>
+<td>~2 GB</td>
+<td><strong>All features, enhanced</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="apertus-family">Apertus Family</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">Workflow</th>
+<th scope="col">Context</th>
+<th scope="col">RAM</th>
+<th scope="col">Languages</th>
+<th scope="col">Compliance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apertus-4b</code></td>
+<td>4B</td>
+<td>Source</td>
+<td>32K</td>
+<td>~2 GB</td>
+<td>1811</td>
+<td>EU AI Act</td>
+</tr>
+</tbody>
+</table>
+<h3 id="feature-matrix">Feature Matrix</h3>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 25%" />
+<col style="width: 23%" />
+<col style="width: 22%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Feature</th>
+<th scope="col">Granite 3.3 8B (Pre-built)</th>
+<th scope="col">Granite 3.3 8B (Source)</th>
+<th scope="col">Granite 4.1 3B (Source)</th>
+<th scope="col">Apertus 4B (Source)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tool Calling</td>
+<td>✅ Baked in</td>
+<td>✅ Custom template</td>
+<td>✅ Enhanced</td>
+<td>✅ Custom template</td>
+</tr>
+<tr>
+<td>Embedding</td>
+<td>✅</td>
+<td>✅ Explicit</td>
+<td>✅ Explicit</td>
+<td>✅ Explicit</td>
+</tr>
+<tr>
+<td>Tagged Content</td>
+<td>✅ Native</td>
+<td>✅ Custom + Native</td>
+<td>✅ Custom + Native</td>
+<td>✅ Custom</td>
+</tr>
+<tr>
+<td>Context Length</td>
+<td>8K</td>
+<td>128K</td>
+<td>128K+</td>
+<td>32K</td>
+</tr>
+<tr>
+<td>Customization</td>
+<td>❌</td>
+<td>✅ Full</td>
+<td>✅ Full</td>
+<td>✅ Full</td>
+</tr>
+<tr>
+<td>Multilingual</td>
+<td>12</td>
+<td>12</td>
+<td>12</td>
+<td><strong>1811</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="configuration-reference">Configuration Reference</h2>
+<h3 id="common-yaml-fields">Common YAML Fields</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Field</th>
+<th scope="col">Type</th>
+<th scope="col">Required</th>
+<th scope="col">Default</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>✅</td>
+<td>-</td>
+<td>Internal name (directory names)</td>
+</tr>
+<tr>
+<td><code>display_name</code></td>
+<td>string</td>
+<td>❌</td>
+<td>-</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td><code>hf_repo</code></td>
+<td>string</td>
+<td>✅</td>
+<td>-</td>
+<td>HuggingFace repository</td>
+</tr>
+<tr>
+<td><code>output</code></td>
+<td>string</td>
+<td>✅</td>
+<td>-</td>
+<td>Output Llamafile name</td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td>string</td>
+<td>❌</td>
+<td>-</td>
+<td>Model type (instruct/base)</td>
+</tr>
+<tr>
+<td><code>quantization</code></td>
+<td>string</td>
+<td>❌</td>
+<td>Q4_K_M</td>
+<td>Quantization method</td>
+</tr>
+<tr>
+<td><code>context_length</code></td>
+<td>int</td>
+<td>❌</td>
+<td>8192</td>
+<td>Context length in tokens</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pre-built-specific-fields">Pre-built Specific Fields</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Field</th>
+<th scope="col">Type</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gguf_file</code></td>
+<td>string</td>
+<td>GGUF filename to download</td>
+</tr>
+<tr>
+<td><code>features</code></td>
+<td>list</td>
+<td>Pre-built features</td>
+</tr>
+</tbody>
+</table>
+<h3 id="source-conversion-specific-fields">Source Conversion Specific
+Fields</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Field</th>
+<th scope="col">Type</th>
+<th scope="col">Required</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_type</code></td>
+<td>string</td>
+<td>❌</td>
+<td>Source format (safetensors)</td>
+</tr>
+<tr>
+<td><code>convert</code></td>
+<td>boolean</td>
+<td>✅</td>
+<td>Must be <code>true</code></td>
+</tr>
+<tr>
+<td><code>chat_template</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Jinja template path</td>
+</tr>
+</tbody>
+</table>
+<h2 id="custom-chat-templates">Custom Chat Templates</h2>
+<h3 id="available-templates">Available Templates</h3>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 28%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Template</th>
+<th scope="col">Models</th>
+<th scope="col">Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>granite-toolcall.jinja</code></td>
+<td>Granite 3.3, 4.1</td>
+<td><code>&lt;tool_call&gt;</code>, <code>&lt;think&gt;</code>,
+<code>&lt;response&gt;</code></td>
+</tr>
+<tr>
+<td><code>apertus-4b-toolcall.jinja</code></td>
+<td>Apertus 4B</td>
+<td><code>&lt;tool_call&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="template-variables">Template Variables</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">Variable</th>
+<th scope="col">Type</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>messages</code></td>
+<td>array</td>
+<td>Message objects</td>
+</tr>
+<tr>
+<td><code>message['role']</code></td>
+<td>string</td>
+<td>system/user/assistant</td>
+</tr>
+<tr>
+<td><code>message['content']</code></td>
+<td>string</td>
+<td>Text content</td>
+</tr>
+<tr>
+<td><code>message['tool_calls']</code></td>
+<td>array</td>
+<td>Tool calls</td>
+</tr>
+<tr>
+<td><code>tool_call['function']</code></td>
+<td>object</td>
+<td>Tool definition</td>
+</tr>
+<tr>
+<td><code>bos_token</code></td>
+<td>string</td>
+<td>BOS token</td>
+</tr>
+<tr>
+<td><code>add_generation_prompt</code></td>
+<td>boolean</td>
+<td>Add generation prompt?</td>
+</tr>
+</tbody>
+</table>
+<h3 id="creating-custom-templates">Creating Custom Templates</h3>
+<ol type="1">
+<li>Create file in <code>templates/</code> directory</li>
+<li>Start with <code>{{- bos_token -}}</code></li>
+<li>Iterate over <code>messages</code></li>
+<li>Handle each role (system/user/assistant)</li>
+<li>For tool calls: Check <code>message.get('tool_calls')</code></li>
+</ol>
+<h2 id="quantization-methods">Quantization Methods</h2>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 18%" />
+<col style="width: 18%" />
+<col style="width: 15%" />
+<col style="width: 11%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Method</th>
+<th scope="col">Size (8B)</th>
+<th scope="col">Size (3B)</th>
+<th scope="col">Quality</th>
+<th scope="col">Speed</th>
+<th scope="col">Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Q4_0</code></td>
+<td>~4.5 GB</td>
+<td>~1.7 GB</td>
+<td>Medium</td>
+<td>Fast</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong><code>Q4_K_M</code></strong></td>
+<td><strong>~4.9 GB</strong></td>
+<td><strong>~1.8 GB</strong></td>
+<td><strong>High</strong></td>
+<td><strong>Fast</strong></td>
+<td><strong>✅</strong></td>
+</tr>
+<tr>
+<td><code>Q5_0</code></td>
+<td>~5.5 GB</td>
+<td>~2.0 GB</td>
+<td>Higher</td>
+<td>Medium</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>Q5_K_M</code></td>
+<td>~6.0 GB</td>
+<td>~2.2 GB</td>
+<td>Very High</td>
+<td>Medium</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>Q6_K</code></td>
+<td>~7.0 GB</td>
+<td>~2.5 GB</td>
+<td>Very High</td>
+<td>Medium</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>Q8_0</code></td>
+<td>~8.0 GB</td>
+<td>~3.0 GB</td>
+<td>Highest</td>
+<td>Slow</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dependencies">Dependencies</h2>
+<h3 id="system">System</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Tool</th>
+<th scope="col">Check</th>
+<th scope="col">Install</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make</code></td>
+<td><code>make --version</code></td>
+<td>Xcode (macOS), <code>sudo apt install make</code> (Linux)</td>
+</tr>
+<tr>
+<td><code>git</code></td>
+<td><code>git --version</code></td>
+<td><code>sudo apt install git</code></td>
+</tr>
+<tr>
+<td><code>curl</code></td>
+<td><code>curl --version</code></td>
+<td><code>sudo apt install curl</code></td>
+</tr>
+<tr>
+<td><code>python3</code></td>
+<td><code>python3 --version</code></td>
+<td><code>brew install python</code> /
+<code>sudo apt install python3</code></td>
+</tr>
+<tr>
+<td><code>uv</code></td>
+<td><code>uv --version</code></td>
+<td><code>pip install --user uv</code> (required for package
+management)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-packages">Python Packages</h3>
+<p><strong>Automatic Installation</strong>: Henry automatically creates
+a local Python virtual environment in the <code>.venv/</code> directory
+and installs all dependencies there when you run <code>make all</code>
+or <code>make python-deps</code>. This makes Henry
+<strong>self-contained</strong> - all Python packages are installed
+within the project directory.</p>
+<p>Required packages:</p>
+<ul>
+<li><code>torch</code> (PyTorch) - Installed from PyTorch CPU wheel
+repository</li>
+<li><code>transformers&gt;=4.56.0</code></li>
+<li><code>safetensors</code></li>
+<li><code>sentencepiece</code></li>
+<li><code>accelerate</code></li>
+<li><code>huggingface_hub</code></li>
+</ul>
+<p>The Makefile automatically uses the local venv’s Python when running
+commands.</p>
+<blockquote>
+<p><strong>Note:</strong> Henry requires <code>uv</code> for creating
+and managing the virtual environment. Install it first with
+<code>pip install --user uv</code> if you don’t have it. The
+<code>.venv/</code> directory is added to <code>.gitignore</code> so it
+won’t be committed to version control.</p>
+</blockquote>
+<h3 id="llama.cpp">llama.cpp</h3>
+<p>Auto-installed by Henry. Manual install:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> henry</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/ggml-org/llama.cpp.git <span class="at">--depth</span> 1</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> llama.cpp <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="at">-j</span> <span class="va">$(</span><span class="fu">nproc</span><span class="va">)</span></span></code></pre></div>
+<h2 id="make-targets">Make Targets</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">Target</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make deps</code></td>
+<td>Check dependencies</td>
+</tr>
+<tr>
+<td><code>make tools</code></td>
+<td>Download llamafile tools</td>
+</tr>
+<tr>
+<td><code>make download</code></td>
+<td>Download/build GGUF</td>
+</tr>
+<tr>
+<td><code>make convert</code></td>
+<td>Convert source to FP16 GGUF</td>
+</tr>
+<tr>
+<td><code>make quantize</code></td>
+<td>Quantize FP16 to target</td>
+</tr>
+<tr>
+<td><code>make package</code></td>
+<td>Package GGUF into Llamafile</td>
+</tr>
+<tr>
+<td><code>make test</code></td>
+<td>Smoke-test Llamafile</td>
+</tr>
+<tr>
+<td><code>make all</code></td>
+<td>Full build (tools + download + package)</td>
+</tr>
+<tr>
+<td><code>make clean</code></td>
+<td>Clean build outputs</td>
+</tr>
+<tr>
+<td><code>make help</code></td>
+<td>Show help</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples">Examples</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pre-built Granite (fastest)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-3.3-8b</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Source Granite 8B (full control)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-3.3-8b-source</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Source Granite 3B (enhanced)</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=granite-4.1-3b-source</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Source Apertus 4B (multilingual)</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=apertus-4b</span></code></pre></div>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="python-not-found">Python Not Found</h3>
+<pre><code>ERROR: python3 is required for conversion</code></pre>
+<p><strong>Fix:</strong> Install Python 3.8+</p>
+<h3 id="uv-not-found">uv Not Found</h3>
+<pre><code>ERROR: uv is required for package management</code></pre>
+<p><strong>Fix:</strong> Install uv first:
+<code>pip install --user uv</code></p>
+<h3 id="local-venv-creation-failed">Local venv Creation Failed</h3>
+<pre><code>ERROR: Failed to create venv</code></pre>
+<p><strong>Fix:</strong> Ensure you have <code>uv</code> installed and
+that your system Python is working. Henry creates a <code>.venv/</code>
+directory in the project root. Make sure you have write permissions in
+the Henry directory.</p>
+<h3 id="python-dependencies-missing">Python Dependencies Missing</h3>
+<pre><code>MISSING: torch
+MISSING: transformers</code></pre>
+<p><strong>Fix:</strong> Run <code>make python-deps</code> or
+<code>make all</code>. Henry will automatically create a local venv in
+<code>.venv/</code> and install all missing packages there. The Makefile
+automatically uses the venv’s Python for all commands.</p>
+<h3 id="llama.cpp-build-failed">llama.cpp Build Failed</h3>
+<pre><code>ERROR: Failed to build llama-quantize</code></pre>
+<p><strong>Fix:</strong> Install build tools:
+<code>sudo apt install build-essential cmake</code> (Linux) or
+<code>xcode-select --install</code> (macOS)</p>
+<h3 id="model-download-failed">Model Download Failed</h3>
+<pre><code>ERROR: Failed to download...</code></pre>
+<p><strong>Fix:</strong> Check <code>hf whoami</code>, accept model
+terms, install <code>hf</code> CLI:
+<code>uv tool install huggingface_hub[cli]</code></p>
+<h3 id="out-of-disk-space">Out of Disk Space</h3>
+<p><strong>Fix:</strong> Need ~20-25 GB for source conversion. Clear
+with <code>rm -rf models-cache/</code></p>
+<h3 id="template-not-found">Template Not Found</h3>
+<p><strong>Fix:</strong> Verify <code>ls templates/</code>, check YAML
+<code>chat_template</code> path</p>
+<h2 id="directory-structure">Directory Structure</h2>
+<pre><code>henry/
+├── .venv/                          # Local Python virtual environment (gitignored)
+│   └── bin/python3                  # Venv Python with all dependencies
+├── models/
+│   ├── granite-3.3-8b.yaml           # Pre-built
+│   ├── granite-3.3-8b-source.yaml    # Source conversion
+│   ├── granite-4.1-3b-source.yaml    # Source conversion
+│   └── apertus-4b.yaml                # Source conversion
+├── templates/
+│   ├── granite-toolcall.jinja        # For Granite
+│   └── apertus-4b-toolcall.jinja      # For Apertus
+├── scripts/
+│   ├── check-python-deps.sh          # Check/install Python dependencies
+│   ├── convert-model.sh              # Convert source to GGUF
+│   ├── quantize-model.sh             # Quantize GGUF
+│   └── download-model.sh             # Download/build models
+├── models-cache/
+│   └── &lt;model&gt;/
+│       ├── source/                  # Source files
+│       └── *.gguf                   # GGUF files
+├── llamafiles/
+│   └── *.llamafile                  # Output
+├── Makefile                         # Build system
+└── Guided-GGUF-Conversion.md        # This guide</code></pre>
+<h2 id="adding-new-models">Adding New Models</h2>
+<h3 id="pre-built-gguf">Pre-built GGUF</h3>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> models/granite-3.3-8b.yaml models/new.yaml</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit: name, hf_repo, gguf_file, output</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=new</span></code></pre></div>
+<h3 id="source-conversion">Source Conversion</h3>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> models/granite-3.3-8b-source.yaml models/new.yaml</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit: name, hf_repo, chat_template, etc.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> templates/granite-toolcall.jinja templates/new.jinja</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit template as needed</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all MODEL=new</span></code></pre></div>
+<h2 id="faq">FAQ</h2>
+<p><strong>Q: Pre-built vs Source conversion?</strong></p>
+<p>A: Pre-built is faster (downloads ready GGUF). Source gives full
+control (custom templates, extended context).</p>
+<p><strong>Q: Which Granite to use?</strong></p>
+<p>A: Use both! Keep <code>granite-3.3-8b.yaml</code> for quick
+deployment and <code>granite-3.3-8b-source.yaml</code> for full
+control.</p>
+<p><strong>Q: Where is Granite 4B?</strong></p>
+<p>A: IBM doesn’t have a text-only 4B Granite. Use
+<code>granite-4.1-3b-source.yaml</code> (3B) or wait for official 4B
+release.</p>
+<p><strong>Q: How to test tool calling?</strong></p>
+<p>A: Start server:
+<code>./llamafiles/model.llamafile --server --port 8080</code> then send
+request with <code>tools</code> array.</p>
+<h2 id="appendix-manual-commands">Appendix: Manual Commands</h2>
+<h3 id="granite-3.3-8b-source">Granite 3.3 8B Source</h3>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Download source</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> models-cache/granite-3.3-8b-source/source</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="ex">hf</span> download ibm-granite/granite-3.3-8b-instruct <span class="dt">\</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--local-dir</span> models-cache/granite-3.3-8b-source/source</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Convert to FP16 GGUF</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> llama.cpp/convert-hf-to-gguf.py <span class="dt">\</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  models-cache/granite-3.3-8b-source/source <span class="dt">\</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  models-cache/granite-3.3-8b-source/granite-3.3-8b.fp16.gguf <span class="dt">\</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outtype</span> f16 <span class="dt">\</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">--chat-template-file</span> templates/granite-toolcall.jinja <span class="dt">\</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--context-length</span> 122880</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Quantize</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="ex">./llama.cpp/build/bin/llama-quantize</span> <span class="dt">\</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  models-cache/granite-3.3-8b-source/granite-3.3-8b.fp16.gguf <span class="dt">\</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  models-cache/granite-3.3-8b-source/granite-3.3-8b-Q4_K_M.gguf <span class="dt">\</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  Q4_K_M</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Package</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> tools/llamafile llamafiles/granite-3.3-8b-source-Q4_K_M.llamafile</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="ex">zipalign</span> <span class="at">-j0</span> llamafiles/granite-3.3-8b-source-Q4_K_M.llamafile <span class="dt">\</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  models-cache/granite-3.3-8b-source/granite-3.3-8b-Q4_K_M.gguf</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x llamafiles/granite-3.3-8b-source-Q4_K_M.llamafile</span></code></pre></div>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://huggingface.co/ibm-granite">IBM Granite
+Models</a></li>
+<li><a href="https://huggingface.co/swiss-ai">Swiss-AI Apertus
+Models</a></li>
+<li><a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a></li>
+<li><a href="https://github.com/ggml-org/gguf">GGUF Format</a></li>
+</ul>
+<p><em>Last updated: June 22, 2026</em> <em>Henry version:
+0.0.2</em></p>
+</section>
+</body>
+</html>

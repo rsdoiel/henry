@@ -1,0 +1,21 @@
+# Meta Llama 3 8B Instruct — Q5_K_M quantization
+name: llama-3-8b-instruct-q5_k_m
+display_name: "Meta Llama 3 8B Instruct Q5_K_M"
+hf_repo: bartowski/Meta-Llama-3-8B-Instruct-GGUF
+gguf_file: Meta-Llama-3-8B-Instruct-Q5_K_M.gguf
+output: Meta-Llama-3-8B-Instruct-Q5_K_M.llamafile
+kind: instruct
+quantization: Q5_K_M
+context_length: 8192
+ram_gb: 6
+features:
+  - tool_calling
+notes: >
+  Meta Llama 3 8B instruction-tuned model at Q5_K_M quantization (~5.7 GB file).
+  High quality, recommended for good balance of performance and accuracy.
+  8K context window (8192 tokens).
+  Model repository: https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
+  GGUF repository: https://huggingface.co/bartowski/Meta-Llama-3-8B-Instruct-GGUF
+  Ollama equivalent: llama3:8b-instruct
+  Better quality than Q4_K_M with still reasonable file size.
+  Requires 8GB+ RAM for comfortable operation.

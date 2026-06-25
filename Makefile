@@ -97,7 +97,7 @@ CITATION.cff: codemeta.json
 about.md: codemeta.json $(PROGRAMS)
 	cmt codemeta.json about.md
 
-website: clean-website .FORCE
+website: .FORCE
 	make -f website.mak
 
 status:
