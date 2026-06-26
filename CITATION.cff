@@ -4,7 +4,7 @@ message: "If you use this software, please cite it as below."
 type: software
 title: henry
 abstract: |-
-  A factory for building Llamafiles from open models on Hugging Face
+  A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co
 authors:
   - family-names: Doiel
     given-names: R. S.
@@ -13,7 +13,7 @@ authors:
 
 
 repository-code: "https://github.com/rsdoiel/henry"
-version: 0.0.1
-date-released: 2026-06-25
+version: 0.0.4
+date-released: 2026-06-26
 
 license-url: "https://www.gnu.org/licenses/agpl-3.0.txt"

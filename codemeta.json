@@ -12,8 +12,8 @@
     }
   ],
   "dateCreated": "2026-06-18",
-  "dateModified": "2026-06-25",
-  "datePublished": "2026-06-25",
+  "dateModified": "2026-06-26",
+  "datePublished": "2026-06-26",
   "description": "A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co",
   "name": "henry",
   "license": "https://www.gnu.org/licenses/agpl-3.0.txt",
@@ -40,7 +40,7 @@
     "huggingface_hub[cli]",
     "Pandoc >= 3.9"
   ],
-  "version": "0.0.3",
+  "version": "0.0.4",
   "developmentStatus": "concept",
   "issueTracker": "https://github.com/rsdoiel/henry/issues",
   "releaseNotes": "Proof of concept Llamafile factory",

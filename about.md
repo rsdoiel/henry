@@ -1,7 +1,7 @@
 ---
 title: henry
 abstract: |-
-  A factory for building Llamafiles from open models on Hugging Face
+  A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co
 authors:
   - family_name: Doiel
     given_name: R. S.
@@ -10,7 +10,7 @@ authors:
 
 
 repository_code: https://github.com/rsdoiel/henry
-version: 0.0.1
+version: 0.0.4
 license_url: https://www.gnu.org/licenses/agpl-3.0.txt
 
 programming_language:
@@ -18,13 +18,13 @@ programming_language:
   - Shell
 
 
-date_released: 2026-06-25
+date_released: 2026-06-26
 ---
 
 About this software
 ===================
 
-## henry 0.0.1
+## henry 0.0.4
 
 Proof of concept Llamafile factory
 
@@ -37,7 +37,7 @@ Proof of concept Llamafile factory
 
 
 
-A factory for building Llamafiles from open models on Hugging Face
+A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co
 
 - [License](https://www.gnu.org/licenses/agpl-3.0.txt)
 - [Code Repository](https://github.com/rsdoiel/henry)
@@ -71,5 +71,6 @@ A factory for building Llamafiles from open models on Hugging Face
 ## Software Suggestions
 
 - huggingface_hub[cli]
+- Pandoc >= 3.9
 
 

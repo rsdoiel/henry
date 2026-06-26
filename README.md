@@ -6,9 +6,9 @@ A factory for building Llamafiles (and GUFF) from open models on HuggingFace.co
 
 ## Release Notes
 
-- version: 0.0.3
+- version: 0.0.4
 - status: concept
-- released: 2026-06-25
+- released: 2026-06-26
 
 Proof of concept Llamafile factory
 
