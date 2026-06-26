@@ -22,7 +22,7 @@
 <h1
 id="henry-model-catalog-complete-guide-to-available-llms"><strong>Henry
 Model Catalog: Complete Guide to Available LLMs</strong></h1>
-<p><em>Last updated: June 25, 2026</em></p>
+<p><em>Last updated: June 26, 2026</em></p>
 <p>This document describes all models with YAML definitions in Henry,
 including their capabilities, ideal use cases, and the hardware
 trade-offs for running each. Models are organized by family and sorted
@@ -63,6 +63,22 @@ Matrix</strong></h2>
 <td>2GB+</td>
 <td>128K</td>
 <td>Structured reasoning, code</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td>~2.2 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td>Multilingual reasoning, code</td>
+<td>Q4_K_M</td>
+</tr>
+<tr>
+<td><strong>SmolLM3 3B</strong></td>
+<td>~2.0 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td>Hybrid reasoning, multilingual</td>
 <td>Q4_K_M</td>
 </tr>
 <tr>
@@ -447,6 +463,51 @@ deployments requiring compliance, tool-enabled chatbots serving diverse
 language communities.</p>
 <p><strong>Note:</strong> Both use custom chat templates supporting
 <code>&lt;tool_call&gt;</code> tags.</p>
+<h2 id="huggingfacetb-smollm3-family"><strong>🧠 HuggingFaceTB SmolLM3
+Family</strong></h2>
+<p>Hugging Face’s compact reasoning models with <strong>hybrid reasoning
+mode</strong> (extended thinking with <code>/think</code> and
+<code>/no_think</code> flags) and excellent <strong>multilingual
+support</strong>.</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 18%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col">Model</th>
+<th scope="col">Size</th>
+<th scope="col">RAM</th>
+<th scope="col">Context</th>
+<th scope="col">Use Case</th>
+<th scope="col">Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>smollm3-3b</code></td>
+<td>~2.0 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td><strong>Compact reasoner</strong> — Hybrid reasoning, multilingual
+(6+ languages), tool calling on minimal hardware</td>
+<td>3B parameters, excellent reasoning/parameter ratio</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features:</strong> <code>tool_calling</code></p>
+<p><strong>Best for:</strong> Applications requiring reasoning
+capabilities in a very compact package, multilingual deployments, hybrid
+reasoning workflows, tool-enabled assistants on resource-constrained
+hardware.</p>
+<p><strong>Note:</strong> Supports extended thinking mode via
+<code>/think</code> and <code>/no_think</code> flags in system prompt or
+<code>enable_thinking</code> parameter.</p>
 <h2 id="google-gemma-family"><strong>🌸 Google Gemma
 Family</strong></h2>
 <p>Google’s efficient models optimized for on-device deployment.</p>
@@ -521,15 +582,24 @@ Family</strong></h2>
 documentation, complex problem-solving</td>
 <td>3.8B parameters, best reasoning/parameter ratio</td>
 </tr>
+<tr>
+<td><code>phi-3.5-mini-instruct</code></td>
+<td>~2.2 GB</td>
+<td>2GB+</td>
+<td>128K</td>
+<td><strong>Multilingual reasoning</strong> — Strong multilingual (20+
+languages), code, math, logic</td>
+<td>3.8B parameters, competitive reasoning</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Features:</strong> <code>tool_calling</code></p>
 <p><strong>Best for:</strong> Applications requiring strong reasoning
 capabilities in a compact package, technical decision-making, code
-analysis.</p>
-<p><strong>Note:</strong> Can use either the embedded chat template from
-<code>tokenizer_config.json</code> or a Phi-3.5-mini fallback
-template.</p>
+analysis, multilingual deployments.</p>
+<p><strong>Note:</strong> Phi-4 Mini can use either the embedded chat
+template from <code>tokenizer_config.json</code> or a Phi-3.5-mini
+fallback template.</p>
 <h2 id="alibaba-qwen-family"><strong>🐉 Alibaba Qwen
 Family</strong></h2>
 <p>Alibaba’s Qwen models, with specialized coding variants.</p>
@@ -681,6 +751,14 @@ laptops</em></p>
 <td>Structured reasoning, technical tasks</td>
 </tr>
 <tr>
+<td>Phi-3.5 Mini</td>
+<td>Multilingual reasoning, code, math, logic</td>
+</tr>
+<tr>
+<td>SmolLM3 3B</td>
+<td>Hybrid reasoning, multilingual, tool calling</td>
+</tr>
+<tr>
 <td>Apertus 4B</td>
 <td>Multilingual chat, 1811 languages</td>
 </tr>
@@ -695,7 +773,8 @@ laptops</em></p>
 </tbody>
 </table>
 <p><strong>Best choice:</strong> Phi-4 Mini for reasoning, Llama 3.2 3B
-for multilingual, Apertus 4B for language coverage.</p>
+for multilingual, Phi-3.5 Mini for multilingual reasoning, SmolLM3 3B
+for hybrid reasoning, Apertus 4B for language coverage.</p>
 <h3 id="tier-2-lightweight-4gb-ram"><strong>Tier 2: Lightweight (4GB
 RAM)</strong></h3>
 <p><em>Can run on: Most modern laptops, M1 MacBook Air, mid-range
@@ -728,10 +807,18 @@ desktops</em></p>
 <td>Gemma 4 E4B</td>
 <td>Technical documentation</td>
 </tr>
+<tr>
+<td>Phi-3.5 Mini</td>
+<td>Multilingual reasoning, code, math</td>
+</tr>
+<tr>
+<td>SmolLM3 3B</td>
+<td>Hybrid reasoning, multilingual</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Best choice:</strong> Llama 3.2 3B Q5_K_M for balanced
-multilingual performance.</p>
+multilingual performance, Phi-3.5 Mini for multilingual reasoning.</p>
 <h3 id="tier-3-standard-6-8gb-ram"><strong>Tier 3: Standard (6-8GB
 RAM)</strong></h3>
 <p><em>Can run on: M1 MacBook Pro, gaming laptops, workstations</em></p>
@@ -824,6 +911,16 @@ Development</strong></h3>
 <td><strong>Phi-4 Mini</strong></td>
 <td>Excellent reasoning for code review</td>
 </tr>
+<tr>
+<td>5</td>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td>Multilingual code reasoning</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>SmolLM3 3B</strong></td>
+<td>Hybrid reasoning for code tasks</td>
+</tr>
 </tbody>
 </table>
 <h3 id="multilingual-applications"><strong>🌍 Multilingual
@@ -849,16 +946,26 @@ Applications</strong></h3>
 </tr>
 <tr>
 <td>2</td>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td>20+ languages, 128K context, strong reasoning</td>
+</tr>
+<tr>
+<td>3</td>
 <td><strong>Llama 3.2 3B Q5_K_M</strong></td>
 <td>9 languages, 128K context</td>
 </tr>
 <tr>
-<td>3</td>
+<td>4</td>
+<td><strong>SmolLM3 3B</strong></td>
+<td>6+ languages, 128K context, hybrid reasoning</td>
+</tr>
+<tr>
+<td>5</td>
 <td><strong>Apertus 4B</strong></td>
 <td>1811 languages, minimal hardware</td>
 </tr>
 <tr>
-<td>4</td>
+<td>6</td>
 <td><strong>Granite 4.1 3B/8B</strong></td>
 <td>Multilingual support, enterprise features</td>
 </tr>
@@ -897,6 +1004,16 @@ Processing (128K Context)</strong></h3>
 </tr>
 <tr>
 <td>5</td>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td>128K context, multilingual reasoning</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>SmolLM3 3B</strong></td>
+<td>128K context, hybrid reasoning</td>
+</tr>
+<tr>
+<td>7</td>
 <td><strong>Granite 4.1 3B (Source)</strong></td>
 <td>128K context, lightweight</td>
 </tr>
@@ -932,6 +1049,16 @@ Assistants</strong></h3>
 <td>4</td>
 <td><strong>Phi-4 Mini</strong></td>
 <td>Strong reasoning in compact package</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td>Multilingual reasoning, 128K context</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>SmolLM3 3B</strong></td>
+<td>Hybrid reasoning, multilingual, 128K context</td>
 </tr>
 </tbody>
 </table>
@@ -970,6 +1097,16 @@ Function Calling</strong></h3>
 </tr>
 <tr>
 <td>4</td>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td><code>tool_calling</code>, 128K context, 20+ languages</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>SmolLM3 3B</strong></td>
+<td><code>tool_calling</code>, 128K context, hybrid reasoning</td>
+</tr>
+<tr>
+<td>6</td>
 <td><strong>Llama 3.2 3B Q6_K_M</strong></td>
 <td><code>tool_calling</code>, 128K context, multilingual</td>
 </tr>
@@ -977,6 +1114,12 @@ Function Calling</strong></h3>
 </table>
 <h3 id="budget-deployments"><strong>💰 Budget Deployments</strong></h3>
 <table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 17%" />
+<col style="width: 25%" />
+<col style="width: 30%" />
+</colgroup>
 <thead>
 <tr>
 <th scope="col">Priority</th>
@@ -1000,12 +1143,24 @@ Function Calling</strong></h3>
 </tr>
 <tr>
 <td>3</td>
+<td><strong>Phi-3.5 Mini</strong></td>
+<td>2GB RAM</td>
+<td>Multilingual reasoning, 128K context</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>SmolLM3 3B</strong></td>
+<td>2GB RAM</td>
+<td>Hybrid reasoning, multilingual, tool calling</td>
+</tr>
+<tr>
+<td>5</td>
 <td><strong>Apertus 4B</strong></td>
 <td>2GB RAM</td>
 <td>1811 languages, tool calling</td>
 </tr>
 <tr>
-<td>4</td>
+<td>6</td>
 <td><strong>Llama 3.2 3B Q4_K_M</strong></td>
 <td>3GB RAM</td>
 <td>Multilingual, 128K context</td>
@@ -1174,25 +1329,25 @@ Scenario</strong></h2>
 <td><strong>Best for coding</strong></td>
 <td>Qwen 2.5 Coder 7B</td>
 <td>Granite 4.1 8B (Source)</td>
-<td>Llama 3 8B Q5_K_M</td>
+<td>Phi-3.5 Mini</td>
 </tr>
 <tr>
 <td><strong>Best multilingual</strong></td>
 <td>Apertus 8B</td>
+<td>Phi-3.5 Mini</td>
 <td>Llama 3.2 3B Q5_K_M</td>
-<td>Apertus 4B</td>
 </tr>
 <tr>
 <td><strong>Best for long docs</strong></td>
 <td>Granite 4.1 8B (Source)</td>
 <td>Llama 3.2 3B Q5_K_M</td>
-<td>Gemma 4 E4B</td>
+<td>Phi-3.5 Mini</td>
 </tr>
 <tr>
 <td><strong>Best reasoning</strong></td>
 <td>Phi-4 Mini</td>
+<td>Phi-3.5 Mini</td>
 <td>Llama 3 8B Q6_K</td>
-<td>Llama 3.2 3B Q6_K_M</td>
 </tr>
 <tr>
 <td><strong>Best enterprise</strong></td>
@@ -1203,14 +1358,14 @@ Scenario</strong></h2>
 <tr>
 <td><strong>Best for edge</strong></td>
 <td>Phi-4 Mini</td>
-<td>Qwen 3.5 2B</td>
-<td>Llama 3.2 3B Q4_K_M</td>
+<td>Phi-3.5 Mini</td>
+<td>SmolLM3 3B</td>
 </tr>
 <tr>
 <td><strong>Lowest RAM</strong></td>
 <td>Qwen 3.5 2B (2GB)</td>
 <td>Phi-4 Mini (2GB)</td>
-<td>Apertus 4B (2GB)</td>
+<td>Phi-3.5 Mini (2GB)</td>
 </tr>
 </tbody>
 </table>
