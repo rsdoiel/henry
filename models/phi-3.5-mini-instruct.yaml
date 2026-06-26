@@ -1,0 +1,33 @@
+# Microsoft Phi-3.5 Mini Instruct — Built from Source
+name: phi-3.5-mini-instruct
+display_name: "Microsoft Phi-3.5 Mini Instruct"
+hf_repo: microsoft/Phi-3.5-mini-instruct
+source_type: safetensors
+
+# Build from source with chat template
+convert: true
+quantization: Q4_K_M
+context_length: 131072
+chat_template: llama.cpp/models/templates/microsoft-Phi-3.5-mini-instruct.jinja
+
+# Output files
+gguf_file: Phi-3.5-mini-instruct-Q4_K_M.gguf
+output: Phi-3.5-mini-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+
+# Metadata
+kind: instruct
+ram_gb: 2
+notes: >
+  Microsoft Phi-3.5 Mini Instruct at Q4_K_M quantization (~2.2 GB file).
+  3.8B parameter model with strong reasoning capabilities.
+  128K context window (131072 tokens).
+  Multilingual support for 20+ languages including Arabic, Chinese, Czech, Danish, Dutch, English, Finnish, French, German, Hebrew, Hungarian, Italian, Japanese, Korean, Norwegian, Polish, Portuguese, Russian, Spanish, Swedish, Thai, Turkish, Ukrainian.
+  Model repository: https://huggingface.co/microsoft/Phi-3.5-mini-instruct
+  Built from source with official chat template.
+  Strong at code, math, logic reasoning, and general conversational use.
+  Runs on M1 Mac Mini (8 GB unified memory) and Raspberry Pi 5 (8 GB RAM).
+  Ollama equivalent: phi-3.5-mini-instruct.

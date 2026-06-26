@@ -1,0 +1,32 @@
+# HuggingFaceTB SmolLM3 3B Instruct — Built from Source
+name: smollm3-3b
+display_name: "HuggingFaceTB SmolLM3 3B Instruct"
+hf_repo: HuggingFaceTB/SmolLM3-3B
+source_type: safetensors
+
+# Build from source with custom template
+convert: true
+quantization: Q4_K_M
+context_length: 131072
+chat_template: llama.cpp/models/templates/HuggingFaceTB-SmolLM3-3B.jinja
+
+# Output files
+gguf_file: SmolLM3-3B-Instruct-Q4_K_M.gguf
+output: SmolLM3-3B-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+
+# Metadata
+kind: instruct
+ram_gb: 2
+notes: >
+  HuggingFaceTB SmolLM3 3B at Q4_K_M quantization (~2.0 GB file).
+  3B parameter model optimized for hybrid reasoning.
+  Supports 128K context window (131072 tokens) via YARN extrapolation.
+  Multilingual support for 6+ languages: English, French, Spanish, German, Italian, Portuguese, plus some support for Arabic, Chinese, Russian.
+  Model repository: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+  Built from source with custom chat template supporting extended thinking mode (/think /no_think).
+  Strong at reasoning, coding, and multilingual tasks.
+  Runs on most modern hardware with 8GB+ RAM.
