@@ -1,0 +1,31 @@
+# Google Gemma 3n E2B Instruct - Built from Source
+name: gemma-3n-e2b-it
+display_name: "Google Gemma 3n E2B Instruct"
+hf_repo: google/gemma-3n-E2B-it
+source_type: safetensors
+
+# Build from source with chat template
+convert: true
+quantization: Q4_K_M
+context_length: 131072
+chat_template: llama.cpp/models/templates/google-gemma-3n-E2B-it.jinja
+
+# Output files
+gguf_file: gemma-3n-E2B-it-Q4_K_M.gguf
+output: Gemma-3n-E2B-Q4_K_M.llamafile
+
+# Features
+features:
+  - tool_calling
+
+# Metadata
+kind: instruct
+ram_gb: 2
+notes: >
+  Google Gemma 3n E2B instruction-tuned model at Q4_K_M quantization (~2.2 GB file).
+  E2B variant of the Gemma 3n architecture with 2B parameters, optimized for edge deployment.
+  Model repository: https://huggingface.co/google/gemma-3n-E2B-it
+  128K context window (131072 tokens).
+  Strong at reasoning, coding, and general conversational tasks.
+  Runs on M1 Mac Mini (8 GB unified memory) and Raspberry Pi 5 (8 GB RAM).
+  Uses a custom chat template for Gemma 3n E2B format.
