@@ -4,7 +4,7 @@ title: Model Guide
 
 # **Henry Model Catalog: Complete Guide to Available LLMs**
 
-*Last updated: June 25, 2026*
+*Last updated: June 26, 2026*
 
 This document describes all models with YAML definitions in Henry, including their capabilities, ideal use cases, and the hardware trade-offs for running each. Models are organized by family and sorted by parameter count.
 
@@ -14,6 +14,8 @@ This document describes all models with YAML definitions in Henry, including the
 |-------|------|-----|---------|----------|--------------|
 | **Qwen 3.5 2B** | ~1.8 GB | 2GB+ | 32K | Lightweight chat, edge | Q8_0 |
 | **Phi-4 Mini** | ~2.2 GB | 2GB+ | 128K | Structured reasoning, code | Q4_K_M |
+| **Phi-3.5 Mini** | ~2.2 GB | 2GB+ | 128K | Multilingual reasoning, code | Q4_K_M |
+| **SmolLM3 3B** | ~2.0 GB | 2GB+ | 128K | Hybrid reasoning, multilingual | Q4_K_M |
 | **Apertus 4B** | ~2.3 GB | 2GB+ | 32K | Multilingual, tool calling | Q4_K_M |
 | **Granite 4.1 3B** | ~2.4 GB | 2GB+ | 128K | Coding, RAG, assistants | Q4_K_M |
 | **Llama 3.2 3B** | ~2.0-3.4 GB | 3-4GB+ | 128K | Multilingual, general use | Q4_K_M-Q8_0 |
@@ -101,6 +103,21 @@ Open models from Swiss-AI with **EU AI Act compliance** and **1811 language supp
 **Note:** Both use custom chat templates supporting `<tool_call>` tags.
 
 
+## **🧠 HuggingFaceTB SmolLM3 Family**
+
+Hugging Face's compact reasoning models with **hybrid reasoning mode** (extended thinking with `/think` and `/no_think` flags) and excellent **multilingual support**.
+
+| Model | Size | RAM | Context | Use Case | Trade-off |
+|-------|------|-----|---------|----------|-----------|
+| `smollm3-3b` | ~2.0 GB | 2GB+ | 128K | **Compact reasoner** — Hybrid reasoning, multilingual (6+ languages), tool calling on minimal hardware | 3B parameters, excellent reasoning/parameter ratio |
+
+**Features:** `tool_calling`
+
+**Best for:** Applications requiring reasoning capabilities in a very compact package, multilingual deployments, hybrid reasoning workflows, tool-enabled assistants on resource-constrained hardware.
+
+**Note:** Supports extended thinking mode via `/think` and `/no_think` flags in system prompt or `enable_thinking` parameter.
+
+
 ## **🌸 Google Gemma Family**
 
 Google's efficient models optimized for on-device deployment.
@@ -123,12 +140,13 @@ Microsoft's reasoning-optimized models with exceptional **reasoning-per-paramete
 | Model | Size | RAM | Context | Use Case | Trade-off |
 |-------|------|-----|---------|----------|-----------|
 | `phi4-mini` | ~2.2 GB | 2GB+ | 128K | **Structured reasoning** — Code review, technical documentation, complex problem-solving | 3.8B parameters, best reasoning/parameter ratio |
+| `phi-3.5-mini-instruct` | ~2.2 GB | 2GB+ | 128K | **Multilingual reasoning** — Strong multilingual (20+ languages), code, math, logic | 3.8B parameters, competitive reasoning |
 
 **Features:** `tool_calling`
 
-**Best for:** Applications requiring strong reasoning capabilities in a compact package, technical decision-making, code analysis.
+**Best for:** Applications requiring strong reasoning capabilities in a compact package, technical decision-making, code analysis, multilingual deployments.
 
-**Note:** Can use either the embedded chat template from `tokenizer_config.json` or a Phi-3.5-mini fallback template.
+**Note:** Phi-4 Mini can use either the embedded chat template from `tokenizer_config.json` or a Phi-3.5-mini fallback template.
 
 
 ## **🐉 Alibaba Qwen Family**
@@ -175,11 +193,13 @@ Alibaba's Qwen models, with specialized coding variants.
 |-------|----------|
 | Qwen 3.5 2B | Basic chat, simple tool calling |
 | Phi-4 Mini | Structured reasoning, technical tasks |
+| Phi-3.5 Mini | Multilingual reasoning, code, math, logic |
+| SmolLM3 3B | Hybrid reasoning, multilingual, tool calling |
 | Apertus 4B | Multilingual chat, 1811 languages |
 | Granite 4.1 3B (Source) | Coding, RAG, enterprise workflows |
 | Llama 3.2 3B (Q4_K_M) | Multilingual, 128K context |
 
-**Best choice:** Phi-4 Mini for reasoning, Llama 3.2 3B for multilingual, Apertus 4B for language coverage.
+**Best choice:** Phi-4 Mini for reasoning, Llama 3.2 3B for multilingual, Phi-3.5 Mini for multilingual reasoning, SmolLM3 3B for hybrid reasoning, Apertus 4B for language coverage.
 
 
 ### **Tier 2: Lightweight (4GB RAM)**
@@ -193,8 +213,10 @@ Alibaba's Qwen models, with specialized coding variants.
 | Qwen 3 4B Instruct (2507) | Latest Qwen improvements |
 | Granite 4.1 3B (Source) | Enterprise workflows |
 | Gemma 4 E4B | Technical documentation |
+| Phi-3.5 Mini | Multilingual reasoning, code, math |
+| SmolLM3 3B | Hybrid reasoning, multilingual |
 
-**Best choice:** Llama 3.2 3B Q5_K_M for balanced multilingual performance.
+**Best choice:** Llama 3.2 3B Q5_K_M for balanced multilingual performance, Phi-3.5 Mini for multilingual reasoning.
 
 
 ### **Tier 3: Standard (6-8GB RAM)**
@@ -231,15 +253,19 @@ Alibaba's Qwen models, with specialized coding variants.
 | 2 | **Granite 4.1 8B (Source)** | 128K context, tool calling for IDE integration |
 | 3 | **Llama 3 8B Q5_K_M** | Strong general code assistance |
 | 4 | **Phi-4 Mini** | Excellent reasoning for code review |
+| 5 | **Phi-3.5 Mini** | Multilingual code reasoning |
+| 5 | **SmolLM3 3B** | Hybrid reasoning for code tasks |
 
 ### **🌍 Multilingual Applications**
 
 | Priority | Model | Why |
 |----------|-------|-----|
 | 1 | **Apertus 8B** | 1811 languages, EU compliant |
-| 2 | **Llama 3.2 3B Q5_K_M** | 9 languages, 128K context |
-| 3 | **Apertus 4B** | 1811 languages, minimal hardware |
-| 4 | **Granite 4.1 3B/8B** | Multilingual support, enterprise features |
+| 2 | **Phi-3.5 Mini** | 20+ languages, 128K context, strong reasoning |
+| 3 | **Llama 3.2 3B Q5_K_M** | 9 languages, 128K context |
+| 4 | **SmolLM3 3B** | 6+ languages, 128K context, hybrid reasoning |
+| 5 | **Apertus 4B** | 1811 languages, minimal hardware |
+| 6 | **Granite 4.1 3B/8B** | Multilingual support, enterprise features |
 
 ### **📄 Long Document Processing (128K Context)**
 
@@ -249,7 +275,9 @@ Alibaba's Qwen models, with specialized coding variants.
 | 2 | **Llama 3.2 3B Q5_K_M** | 128K context, multilingual, balanced |
 | 3 | **Gemma 4 E4B** | 128K context, efficient architecture |
 | 4 | **Phi-4 Mini** | 128K context, strong reasoning |
-| 5 | **Granite 4.1 3B (Source)** | 128K context, lightweight |
+| 5 | **Phi-3.5 Mini** | 128K context, multilingual reasoning |
+| 6 | **SmolLM3 3B** | 128K context, hybrid reasoning |
+| 7 | **Granite 4.1 3B (Source)** | 128K context, lightweight |
 
 ### **🎯 General Chat & Assistants**
 
@@ -259,6 +287,8 @@ Alibaba's Qwen models, with specialized coding variants.
 | 2 | **Llama 3.2 3B Q5_K_M** | 128K context, multilingual |
 | 3 | **Granite 4.1 8B (Source)** | Enterprise features, 128K context |
 | 4 | **Phi-4 Mini** | Strong reasoning in compact package |
+| 5 | **Phi-3.5 Mini** | Multilingual reasoning, 128K context |
+| 6 | **SmolLM3 3B** | Hybrid reasoning, multilingual, 128K context |
 
 ### **🔌 Tool Calling & Function Calling**
 
@@ -267,7 +297,9 @@ Alibaba's Qwen models, with specialized coding variants.
 | 1 | **Granite 4.1 8B (Source)** | `tool_calling`, `function_calling`, `embedding`, `tagged` |
 | 2 | **Granite 3.3 8B (Source)** | Same as above, 128K context |
 | 3 | **Apertus 8B** | `tool_calling`, `embedding`, `tagged`, 1811 languages |
-| 4 | **Llama 3.2 3B Q6_K_M** | `tool_calling`, 128K context, multilingual |
+| 4 | **Phi-3.5 Mini** | `tool_calling`, 128K context, 20+ languages |
+| 5 | **SmolLM3 3B** | `tool_calling`, 128K context, hybrid reasoning |
+| 6 | **Llama 3.2 3B Q6_K_M** | `tool_calling`, 128K context, multilingual |
 
 ### **💰 Budget Deployments**
 
@@ -275,8 +307,10 @@ Alibaba's Qwen models, with specialized coding variants.
 |----------|-------|----------|------------|
 | 1 | **Qwen 3.5 2B** | 2GB RAM | Basic tool calling, 32K context |
 | 2 | **Phi-4 Mini** | 2GB RAM | Strong reasoning, 128K context |
-| 3 | **Apertus 4B** | 2GB RAM | 1811 languages, tool calling |
-| 4 | **Llama 3.2 3B Q4_K_M** | 3GB RAM | Multilingual, 128K context |
+| 3 | **Phi-3.5 Mini** | 2GB RAM | Multilingual reasoning, 128K context |
+| 4 | **SmolLM3 3B** | 2GB RAM | Hybrid reasoning, multilingual, tool calling |
+| 5 | **Apertus 4B** | 2GB RAM | 1811 languages, tool calling |
+| 6 | **Llama 3.2 3B Q4_K_M** | 3GB RAM | Multilingual, 128K context |
 
 ## **⚖️ Trade-off Summary**
 
@@ -312,13 +346,13 @@ Alibaba's Qwen models, with specialized coding variants.
 | Scenario | Best Model | Runner-Up | Budget Option |
 |----------|------------|-----------|---------------|
 | **Best overall** | Llama 3 8B Q5_K_M | Llama 3.2 3B Q5_K_M | Llama 3.2 3B Q4_K_M |
-| **Best for coding** | Qwen 2.5 Coder 7B | Granite 4.1 8B (Source) | Llama 3 8B Q5_K_M |
-| **Best multilingual** | Apertus 8B | Llama 3.2 3B Q5_K_M | Apertus 4B |
-| **Best for long docs** | Granite 4.1 8B (Source) | Llama 3.2 3B Q5_K_M | Gemma 4 E4B |
-| **Best reasoning** | Phi-4 Mini | Llama 3 8B Q6_K | Llama 3.2 3B Q6_K_M |
+| **Best for coding** | Qwen 2.5 Coder 7B | Granite 4.1 8B (Source) | Phi-3.5 Mini |
+| **Best multilingual** | Apertus 8B | Phi-3.5 Mini | Llama 3.2 3B Q5_K_M |
+| **Best for long docs** | Granite 4.1 8B (Source) | Llama 3.2 3B Q5_K_M | Phi-3.5 Mini |
+| **Best reasoning** | Phi-4 Mini | Phi-3.5 Mini | Llama 3 8B Q6_K |
 | **Best enterprise** | Granite 4.1 8B (Source) | Granite 3.3 8B (Source) | Apertus 8B |
-| **Best for edge** | Phi-4 Mini | Qwen 3.5 2B | Llama 3.2 3B Q4_K_M |
-| **Lowest RAM** | Qwen 3.5 2B (2GB) | Phi-4 Mini (2GB) | Apertus 4B (2GB) |
+| **Best for edge** | Phi-4 Mini | Phi-3.5 Mini | SmolLM3 3B |
+| **Lowest RAM** | Qwen 3.5 2B (2GB) | Phi-4 Mini (2GB) | Phi-3.5 Mini (2GB) |
 
 ## **📦 Model Type Key**
 
