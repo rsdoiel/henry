@@ -1,0 +1,33 @@
+# Meta Code Llama 7B Instruct - Q5_K_M quantization
+name: codellama-7b-instruct-q5_k_m
+display_name: "Meta Code Llama 7B Instruct Q5_K_M"
+hf_repo: codellama/CodeLlama-7b-Instruct-hf
+source_type: safetensors
+
+# Build from source with chat template
+convert: true
+quantization: Q5_K_M
+context_length: 4096
+chat_template: templates/codellama.jinja
+
+# Output files
+gguf_file: codellama-7b-instruct-Q5_K_M.gguf
+output: CodeLlama-7B-Instruct-Q5_K_M.llamafile
+
+# Features
+features:
+  - coding
+
+# Metadata
+kind: instruct
+ram_gb: 5
+notes: >
+  Meta Code Llama 7B instruction-tuned model at Q5_K_M quantization (~4.9 GB file).
+  Higher quality than Q4_K_M with better accuracy for complex coding tasks.
+  Specialized for code synthesis and understanding, supporting Python and other programming languages.
+  Based on Llama 2 architecture with 7B parameters.
+  Model repository: https://huggingface.co/codellama/CodeLlama-7b-Instruct-hf
+  4K context window (4096 tokens).
+  Strong at code completion, infilling, and code-related conversations.
+  Uses Llama 2 style chat template with [INST] and [/INST] tags.
+  Requires 5GB+ RAM for comfortable operation.

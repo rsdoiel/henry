@@ -4,7 +4,7 @@ title: Model Guide
 
 # **Henry Model Catalog: Complete Guide to Available LLMs**
 
-*Last updated: June 26, 2026*
+*Last updated: June 28, 2026*
 
 This document describes all models with YAML definitions in Henry, including their capabilities, ideal use cases, and the hardware trade-offs for running each. Models are organized by family and sorted by parameter count.
 
@@ -25,6 +25,7 @@ This document describes all models with YAML definitions in Henry, including the
 | **Qwen 3 4B** | ~2.7 GB | 3GB+ | 32K | General reasoning | Q5_K_S |
 | **Apertus 8B** | ~4.9 GB | 6GB+ | 32K | Heavy multilingual | Q4_K_M |
 | **Qwen 2.5 Coder 7B** | ~4.5 GB | 5GB+ | 32K | Code generation | Q4_K_M |
+| **CodeLlama 7B** | ~4.1-4.9 GB | 4-5GB+ | 4K | Code synthesis, understanding | Q4_K_M-Q5_K_M |
 | **Llama 3 8B** | ~4.9-8.5 GB | 5-9GB+ | 8K | General chat, code | Q4_K_M-Q8_0 |
 | **Granite 4.1 8B** | ~4.9 GB | 6GB+ | 128K | Enterprise assistants | Q4_K_M |
 | **Granite 3.3 8B (Source)** | ~4.9 GB | 6GB+ | 128K | Custom tool workflows | Q4_K_M |
@@ -61,6 +62,19 @@ The original Llama 3 models with **8K token context**. Strong at instruction fol
 **Best for:** General conversational AI, code assistance, API servers, applications where 8K context is sufficient.
 
 **Note:** Llama 3 models lack the extended context and multilingual capabilities of Llama 3.2 but have been more thoroughly tested in production.
+
+### **CodeLlama Series** — Code Specialists
+
+Based on **Llama 2 architecture**, CodeLlama models are specialized for **code synthesis and understanding**. Available in 7B, 13B, and 34B parameter sizes, with the 7B version being the most accessible.
+
+| Model | Quant | Size | RAM | Context | Use Case | Trade-off |
+|-------|-------|------|-----|---------|----------|-----------|
+| `codellama-7b-instruct` | Q4_K_M | ~4.1 GB | 4GB+ | **Code specialist** — Optimized for code completion, infilling, and code understanding | Smallest, good quality |
+| `codellama-7b-instruct-q5_k_m` | Q5_K_M | ~4.9 GB | 5GB+ | **High-quality code** — Better accuracy for complex coding tasks | 20% larger, higher quality |
+
+**Best for:** Code completion, code infilling, code understanding, Python and other programming languages, IDE integrations, code-focused applications.
+
+**Note:** CodeLlama models use Llama 2 style chat template with `[INST]` and `[/INST]` tags. Specialized for code tasks rather than general conversation.
 
 
 ## **🪨 IBM Granite Family**
@@ -218,6 +232,7 @@ Alibaba's Qwen models, with specialized coding variants.
 | Gemma 4 E4B | Technical documentation |
 | Phi-3.5 Mini | Multilingual reasoning, code, math |
 | SmolLM3 3B | Hybrid reasoning, multilingual |
+| CodeLlama 7B (Q4_K_M) | Code synthesis, understanding |
 | Gemma 3n E2B | Compact reasoning, edge deployment |
 
 **Best choice:** Llama 3.2 3B Q5_K_M for balanced multilingual performance, Phi-3.5 Mini for multilingual reasoning.
@@ -233,6 +248,7 @@ Alibaba's Qwen models, with specialized coding variants.
 | Granite 3.3 8B / 4.1 8B | Enterprise, function calling |
 | Apertus 8B | Heavy multilingual |
 | Qwen 2.5 Coder 7B | Code generation |
+| CodeLlama 7B (Q4_K_M-Q5_K_M) | Code synthesis, understanding |
 
 **Best choice:** Llama 3 8B Q5_K_M for best balance, Granite 4.1 8B for enterprise tool workflows.
 
@@ -254,12 +270,14 @@ Alibaba's Qwen models, with specialized coding variants.
 | Priority | Model | Why |
 |----------|-------|-----|
 | 1 | **Qwen 2.5 Coder 7B** | Specialized for code, strong on Go/TypeScript |
-| 2 | **Granite 4.1 8B (Source)** | 128K context, tool calling for IDE integration |
-| 3 | **Llama 3 8B Q5_K_M** | Strong general code assistance |
-| 4 | **Phi-4 Mini** | Excellent reasoning for code review |
-| 5 | **Phi-3.5 Mini** | Multilingual code reasoning |
-| 5 | **SmolLM3 3B** | Hybrid reasoning for code tasks |
-| 6 | **Gemma 3n E2B** | Compact reasoning for code on edge devices |
+| 2 | **CodeLlama 7B Q5_K_M** | Llama 2 based, excellent for code synthesis and understanding |
+| 3 | **Granite 4.1 8B (Source)** | 128K context, tool calling for IDE integration |
+| 4 | **Llama 3 8B Q5_K_M** | Strong general code assistance |
+| 5 | **Phi-4 Mini** | Excellent reasoning for code review |
+| 6 | **Phi-3.5 Mini** | Multilingual code reasoning |
+| 7 | **SmolLM3 3B** | Hybrid reasoning for code tasks |
+| 8 | **Gemma 3n E2B** | Compact reasoning for code on edge devices |
+| 9 | **CodeLlama 7B Q4_K_M** | Budget-friendly code specialist |
 
 ### **🌍 Multilingual Applications**
 
@@ -354,7 +372,7 @@ Alibaba's Qwen models, with specialized coding variants.
 | Scenario | Best Model | Runner-Up | Budget Option |
 |----------|------------|-----------|---------------|
 | **Best overall** | Llama 3 8B Q5_K_M | Llama 3.2 3B Q5_K_M | Llama 3.2 3B Q4_K_M |
-| **Best for coding** | Qwen 2.5 Coder 7B | Granite 4.1 8B (Source) | Phi-3.5 Mini |
+| **Best for coding** | Qwen 2.5 Coder 7B | CodeLlama 7B Q5_K_M | CodeLlama 7B Q4_K_M |
 | **Best multilingual** | Apertus 8B | Phi-3.5 Mini | Llama 3.2 3B Q5_K_M |
 | **Best for long docs** | Granite 4.1 8B (Source) | Llama 3.2 3B Q5_K_M | Phi-3.5 Mini |
 | **Best reasoning** | Phi-4 Mini | Phi-3.5 Mini | Llama 3 8B Q6_K |

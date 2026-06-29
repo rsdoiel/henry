@@ -1,0 +1,25 @@
+{{- bos_token }}
+{%- if messages[0]['role'] == 'system' %}
+    {%- set system_message = messages[0]['content']|trim %}
+    {%- set messages = messages[1:] %}
+{%- else %}
+    {%- set system_message = "" %}
+{%- endif %}
+{%- if messages|length > 0 %}
+    {%- for message in messages %}
+        {%- if loop.index == 1 %}
+            {{- '<s>[INST]' }}
+            {%- if system_message %}
+                {{- ' <<SYS>>' + system_message + '<</SYS>>' }}
+            {%- endif %}
+            {{- message['content'] | trim + ' [/INST]' }}
+        {%- elif message['role'] == 'user' %}
+            {{- '<s>[INST] ' + message['content'] | trim + ' [/INST]' }}
+        {%- elif message['role'] == 'assistant' %}
+            {{- ' ' + message['content'] | trim + ' </s>' }}
+        {%- endif %}
+    {%- endfor %}
+{%- endif %}
+{%- if add_generation_prompt and messages and messages[-1]['role'] == 'user' %}
+    {{- ' ' }}
+{%- endif %}
