@@ -1,0 +1,29 @@
+# PrismML 1-bit Bonsai 8B — Q1_0 (native 1-bit) quantization
+name: bonsai-8b
+display_name: "1-bit Bonsai 8B"
+hf_repo: prism-ml/Bonsai-8B-gguf
+gguf_file: Bonsai-8B-Q1_0.gguf
+output: Bonsai-8B-Q1_0.llamafile
+kind: instruct
+quantization: Q1_0
+context_length: 65536
+ram_gb: 2
+features:
+  - tool_calling
+notes: >
+  Built by PrismML (Caltech) from Qwen3-8B, bit-packed as GGML type Q1_0:
+  one sign bit per weight plus one shared FP16 scale per 128-weight group
+  (~1.125 bits/weight, ~1.15 GB total vs 16.38 GB FP16). Confirmed the
+  gguf tensor type by parsing the file's GGUF header directly (type=41,
+  254 quantized tensors); confirmed GGML_TYPE_Q1_0 has full CPU (x86/ARM
+  SIMD), CUDA, Metal, and Vulkan kernels already merged into the exact
+  llama.cpp commit that llamafile 0.10.3 vendors — no PrismML fork or
+  patch needed, contrary to PrismML's own docs (which are stale on this
+  point). Should build/run with henry's stock tooling.
+  PrismML's whitepaper does not disclose the actual 1-bit training/
+  quantization algorithm beyond "proprietary Caltech IP" — treat model
+  quality claims as PrismML-reported until verified locally.
+  RoPE uses YaRN scaling (factor 4x, native 16384 -> 65536); if generation
+  quality degrades at long context, try capping context_length at 16384.
+  ram_gb is a rough floor for the weights only — KV cache at long context
+  will dominate actual memory use.
